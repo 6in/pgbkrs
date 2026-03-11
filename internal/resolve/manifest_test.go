@@ -373,6 +373,51 @@ func TestBuildManifest_FKRestoreEntry(t *testing.T) {
 	}
 }
 
+func TestReadManifest_NonexistentPath(t *testing.T) {
+	_, err := ReadManifest("/nonexistent/path/_manifest.yaml")
+	if err == nil {
+		t.Fatal("ReadManifest with nonexistent path should return error")
+	}
+}
+
+func TestReadManifest_ValidFile(t *testing.T) {
+	m := &Manifest{
+		BackupAt:    "2024-01-01T12:00:00Z",
+		PgVersion:   "16.1",
+		ToolVersion: "1.0.0",
+		Snapshot:    true,
+		RestoreOrder: []RestoreEntry{
+			{Schema: "public", Kind: "table", Name: "users"},
+			{Schema: "public", Kind: "table", Name: "orders"},
+		},
+	}
+
+	dir := t.TempDir()
+	path := filepath.Join(dir, "_manifest.yaml")
+
+	if err := WriteManifest(path, m); err != nil {
+		t.Fatalf("WriteManifest failed: %v", err)
+	}
+
+	got, err := ReadManifest(path)
+	if err != nil {
+		t.Fatalf("ReadManifest failed: %v", err)
+	}
+
+	if got.BackupAt != m.BackupAt {
+		t.Errorf("BackupAt = %q, want %q", got.BackupAt, m.BackupAt)
+	}
+	if got.PgVersion != m.PgVersion {
+		t.Errorf("PgVersion = %q, want %q", got.PgVersion, m.PgVersion)
+	}
+	if len(got.RestoreOrder) != 2 {
+		t.Fatalf("RestoreOrder len = %d, want 2", len(got.RestoreOrder))
+	}
+	if got.RestoreOrder[0].Name != "users" {
+		t.Errorf("RestoreOrder[0].Name = %q, want 'users'", got.RestoreOrder[0].Name)
+	}
+}
+
 func TestWriteManifest(t *testing.T) {
 	m := &Manifest{
 		BackupAt:    "2024-01-01T12:00:00Z",

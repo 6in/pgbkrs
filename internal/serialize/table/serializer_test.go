@@ -120,6 +120,39 @@ rls:
 	}
 }
 
+func TestIndexDefinitionRoundTrip(t *testing.T) {
+	s := &table.Serializer{}
+	def := &core.TableDef{
+		ObjectHeader: core.ObjectHeader{Kind: core.KindTable, Schema: "public", Name: "t"},
+		Columns:      []core.ColumnDef{{Name: "id", Type: "integer", Nullable: false}},
+		Indexes: []core.IndexDef{
+			{Name: "foo", Method: "btree", Definition: "CREATE INDEX foo ON t(id)"},
+		},
+		RLS: core.RLSDef{Enabled: false},
+	}
+
+	data, err := s.Serialize(def)
+	if err != nil {
+		t.Fatalf("Serialize() error: %v", err)
+	}
+
+	obj, err := s.Deserialize(data)
+	if err != nil {
+		t.Fatalf("Deserialize() error: %v", err)
+	}
+
+	td, ok := obj.(*core.TableDef)
+	if !ok {
+		t.Fatalf("expected *core.TableDef, got %T", obj)
+	}
+	if len(td.Indexes) != 1 {
+		t.Fatalf("expected 1 index, got %d", len(td.Indexes))
+	}
+	if td.Indexes[0].Definition != "CREATE INDEX foo ON t(id)" {
+		t.Errorf("Definition = %q, want 'CREATE INDEX foo ON t(id)'", td.Indexes[0].Definition)
+	}
+}
+
 func TestSerializeWithPartitioning(t *testing.T) {
 	s := &table.Serializer{}
 	def := &core.TableDef{
