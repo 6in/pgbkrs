@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 09-restore-partial-safety/09-01-PLAN.md
-last_updated: "2026-03-11T23:47:32.559Z"
+stopped_at: Completed 09-restore-partial-safety/09-02-PLAN.md
+last_updated: "2026-03-11T23:53:15.530Z"
 last_activity: 2026-03-11 — Completed 06-02 Manifest Writer
 progress:
   total_phases: 10
   completed_phases: 8
   total_plans: 27
-  completed_plans: 25
+  completed_plans: 26
   percent: 95
 ---
 
@@ -75,6 +75,7 @@ Progress: [██████████] 95%
 | Phase 08-restore-core-pipeline P02 | 8 | 2 tasks | 4 files |
 | Phase 08-restore-core-pipeline P03 | 1 | 2 tasks | 1 files |
 | Phase 09 P01 | 25 | 2 tasks | 8 files |
+| Phase 09-restore-partial-safety P02 | 20 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -142,6 +143,8 @@ Recent decisions affecting current work:
 - [Phase 09]: Options struct defined in filter.go (owns filter types), orchestrator uses it in same package — avoids circular dep
 - [Phase 09]: snapshotLiveObjects and Logger creation failures are non-fatal: log stderr and continue (graceful degradation)
 - [Phase 09]: FK post-BFS pass uses len(DependsOn)>0 guard to exclude vacuous FK inclusions in empty closures
+- [Phase 09-restore-partial-safety]: export_test.go pattern used to expose filteredRestoreOrder for black-box unit testing without exporting it publicly
+- [Phase 09-restore-partial-safety]: TestMissingDependencyError constructs minimal resolve.Manifest directly for pure unit test of REST-12 without DB dependency
 
 ### Pending Todos
 
@@ -153,6 +156,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T23:47:32.557Z
-Stopped at: Completed 09-restore-partial-safety/09-01-PLAN.md
+Last session: 2026-03-11T23:53:15.528Z
+Stopped at: Completed 09-restore-partial-safety/09-02-PLAN.md
 Resume file: None
