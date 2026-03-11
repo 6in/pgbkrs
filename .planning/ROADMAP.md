@@ -151,7 +151,12 @@ Plans:
   5. Indexes are created after all tables and data are loaded
   6. FK constraints are applied in a single batch after all tables and data exist
   7. Views, functions, triggers, and policies are created in their manifest-specified order
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Wave 0: ReadManifest + yamlIndex.definition gap fix + test stubs (Wave 1)
+- [ ] 08-02-PLAN.md — restore/loader.go + restore/orchestrator.go: full 7-wave pipeline (Wave 2)
+- [ ] 08-03-PLAN.md — CLI wiring (--input, --pre-backup-dir) + human verify checkpoint (Wave 3)
 
 ### Phase 9: Restore - Partial & Safety
 **Goal**: Users can restore a subset of objects (by schema or by individual object name), the tool automatically pulls in transitive dependencies, stops on missing dependencies, detects objects that survived the DROP phase, and writes structured logs for every restore operation
@@ -190,6 +195,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 5. Serialization | 0/3 | Not started | - |
 | 6. Dependency Resolution & Manifest | 2/2 | Complete   | 2026-03-11 |
 | 7. Backup Orchestration | 2/2 | Complete   | 2026-03-11 |
-| 8. Restore - Core Pipeline | 0/TBD | Not started | - |
+| 8. Restore - Core Pipeline | 0/3 | Not started | - |
 | 9. Restore - Partial & Safety | 0/TBD | Not started | - |
 | 10. Schema Diff | 0/TBD | Not started | - |
