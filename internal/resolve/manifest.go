@@ -195,3 +195,16 @@ func WriteManifest(path string, m *Manifest) error {
 	}
 	return os.WriteFile(path, data, 0644)
 }
+
+// ReadManifest reads and parses a _manifest.yaml file from the given path.
+func ReadManifest(path string) (*Manifest, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("read manifest: %w", err)
+	}
+	var m Manifest
+	if err := yaml.Unmarshal(data, &m); err != nil {
+		return nil, fmt.Errorf("parse manifest: %w", err)
+	}
+	return &m, nil
+}

@@ -58,8 +58,9 @@ type yamlCheck struct {
 }
 
 type yamlIndex struct {
-	Name   string `yaml:"name"`
-	Method string `yaml:"method"`
+	Name       string `yaml:"name"`
+	Method     string `yaml:"method"`
+	Definition string `yaml:"definition,omitempty"`
 }
 
 type yamlPartitioning struct {
@@ -121,8 +122,9 @@ func toYAML(td *core.TableDef) yamlTableDef {
 	// Indexes
 	for _, idx := range td.Indexes {
 		yd.Indexes = append(yd.Indexes, yamlIndex{
-			Name:   idx.Name,
-			Method: idx.Method,
+			Name:       idx.Name,
+			Method:     idx.Method,
+			Definition: idx.Definition,
 		})
 	}
 
@@ -189,11 +191,12 @@ func fromYAML(yd yamlTableDef) *core.TableDef {
 		})
 	}
 
-	// Indexes (method only; Definition not stored in YAML)
+	// Indexes
 	for _, idx := range yd.Indexes {
 		td.Indexes = append(td.Indexes, core.IndexDef{
-			Name:   idx.Name,
-			Method: idx.Method,
+			Name:       idx.Name,
+			Method:     idx.Method,
+			Definition: idx.Definition,
 		})
 	}
 
