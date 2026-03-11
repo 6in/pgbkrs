@@ -59,8 +59,9 @@ type kindFetcher struct {
 }
 
 // RunBackup executes a full backup of all user schemas to outDir.
-// snapshot=false: each fetch/export uses conn directly.
-// snapshot=true: TODO(Plan 02): snapshot mode — wrap in RepeatableRead transaction.
+// snapshot=false: each fetch/export uses conn directly (no transaction).
+// snapshot=true: wraps all fetches and COPY TO calls in a single REPEATABLE READ
+// transaction; tx.Conn() is passed so that COPY participates in the snapshot.
 func RunBackup(ctx context.Context, conn *pgx.Conn, outDir string, snapshot bool) error {
 	// 1. Create timestamped backup root
 	backupRoot := filepath.Join(outDir, time.Now().UTC().Format("backup_20060102_150405"))
@@ -74,13 +75,32 @@ func RunBackup(ctx context.Context, conn *pgx.Conn, outDir string, snapshot bool
 		return fmt.Errorf("fetch pg_version: %w", err)
 	}
 
-	// 3. Discover user schemas
-	schemas, err := discoverSchemas(ctx, conn)
+	// 3. Determine the query connection: snapshot mode uses a REPEATABLE READ transaction
+	// so that all fetches and COPY TO calls share the same consistent snapshot.
+	var queryConn *pgx.Conn
+	var tx pgx.Tx
+	if snapshot {
+		var err error
+		tx, err = conn.BeginTx(ctx, pgx.TxOptions{
+			IsoLevel:   pgx.RepeatableRead,
+			AccessMode: pgx.ReadOnly,
+		})
+		if err != nil {
+			return fmt.Errorf("begin snapshot transaction: %w", err)
+		}
+		defer tx.Rollback(ctx) // safe no-op after Commit
+		queryConn = tx.Conn()
+	} else {
+		queryConn = conn
+	}
+
+	// 4. Discover user schemas
+	schemas, err := discoverSchemas(ctx, queryConn)
 	if err != nil {
 		return fmt.Errorf("discover schemas: %w", err)
 	}
 
-	// 4. All fetchers in iteration order
+	// 5. All fetchers in iteration order
 	fetchers := []kindFetcher{
 		{core.KindTable, &fetchTable.SchemaFetcher{}},
 		{core.KindView, &fetchView.SchemaFetcher{}},
@@ -100,7 +120,7 @@ func RunBackup(ctx context.Context, conn *pgx.Conn, outDir string, snapshot bool
 
 	for _, schema := range schemas {
 		// First pass: fetch tables to build childOf map for partition routing.
-		rawTables, err := (&fetchTable.SchemaFetcher{}).Fetch(ctx, conn, schema)
+		rawTables, err := (&fetchTable.SchemaFetcher{}).Fetch(ctx, queryConn, schema)
 		if err != nil {
 			return fmt.Errorf("fetch tables in schema %s: %w", schema, err)
 		}
@@ -128,10 +148,11 @@ func RunBackup(ctx context.Context, conn *pgx.Conn, outDir string, snapshot bool
 					}
 
 					// Export data for non-partitioned tables only.
+					// queryConn is used so that COPY TO participates in the snapshot transaction.
 					if export.ShouldExportData(td) {
 						cols := columnNames(td)
 						csvPath := filepath.Join(tableDir, "data.csv")
-						meta, err := export.ExportTableData(ctx, conn, schema, td.Name, csvPath, cols)
+						meta, err := export.ExportTableData(ctx, queryConn, schema, td.Name, csvPath, cols)
 						if err != nil {
 							return fmt.Errorf("export %s.%s: %w", schema, td.Name, err)
 						}
@@ -159,7 +180,7 @@ func RunBackup(ctx context.Context, conn *pgx.Conn, outDir string, snapshot bool
 			}
 
 			// Non-table objects
-			defs, err := kf.fetcher.Fetch(ctx, conn, schema)
+			defs, err := kf.fetcher.Fetch(ctx, queryConn, schema)
 			if err != nil {
 				return fmt.Errorf("fetch %s in schema %s: %w", kf.kind, schema, err)
 			}
@@ -186,7 +207,14 @@ func RunBackup(ctx context.Context, conn *pgx.Conn, outDir string, snapshot bool
 		}
 	}
 
-	// 5. Build and write manifest.
+	// 6. Commit snapshot transaction (no-op for non-snapshot mode).
+	if snapshot {
+		if err := tx.Commit(ctx); err != nil {
+			return fmt.Errorf("commit snapshot transaction: %w", err)
+		}
+	}
+
+	// 7. Build and write manifest.
 	params := resolve.ManifestParams{
 		BackupAt:    time.Now().UTC().Format(time.RFC3339),
 		PgVersion:   pgVersion,
