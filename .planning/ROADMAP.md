@@ -84,7 +84,13 @@ Plans:
   2. FK ALTER TABLE DDL is generated separately and applies all foreign key constraints when executed after all tables exist
   3. DROP DDL is generated for every object type (table, view, materialized view, function, trigger, sequence, type, domain, ENUM, policy)
   4. CREATE DDL for views, materialized views, functions, and triggers is generated and syntactically valid
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — ForeignKeyDef type + PartitionDef.KeyExpression + FK SchemaFetcher + all 11 DDL generator test stubs (Wave 1)
+- [ ] 04-02-PLAN.md — Table and FK DDL generators: CREATE TABLE (no FK), ALTER TABLE ADD/DROP CONSTRAINT (Wave 2)
+- [ ] 04-03-PLAN.md — View, MatView, Function, Trigger DDL generators: CREATE + DROP (Wave 2, parallel)
+- [ ] 04-04-PLAN.md — Sequence, CompositeType, Domain, Enum, Policy DDL generators: CREATE + DROP (Wave 2, parallel)
 
 ### Phase 5: Serialization
 **Goal**: The tool can write each object's in-memory definition to a YAML file conforming to the spec, export table data as COPY TO CSV, handle partition parent/child split, and record checksum and row count in each data file's metadata
@@ -167,7 +173,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 1. Foundation | 2/2 | Complete   | 2026-03-11 |
 | 2. Schema Fetch - Tables & Sequences | 4/4 | Complete   | 2026-03-11 |
 | 3. Schema Fetch - Views, Functions, Triggers & Policies | 4/4 | Complete   | 2026-03-11 |
-| 4. DDL Generation | 0/TBD | Not started | - |
+| 4. DDL Generation | 0/4 | Not started | - |
 | 5. Serialization | 0/TBD | Not started | - |
 | 6. Dependency Resolution & Manifest | 0/TBD | Not started | - |
 | 7. Backup Orchestration | 0/TBD | Not started | - |
