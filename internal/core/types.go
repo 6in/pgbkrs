@@ -14,6 +14,7 @@ const (
 	KindDomain           ObjectKind = "domain"
 	KindEnum             ObjectKind = "enum"
 	KindPolicy           ObjectKind = "policy"
+	KindForeignKey       ObjectKind = "foreign_key"
 )
 
 // ObjectHeader holds the identifying metadata for any PostgreSQL schema object.
@@ -70,8 +71,9 @@ type IndexDef struct {
 
 // PartitionDef describes a partitioned table's partitioning strategy.
 type PartitionDef struct {
-	Strategy string   // "range", "list", "hash"
-	Children []string // child table names
+	Strategy      string   // "range", "list", "hash"
+	KeyExpression string   // pg_get_partkeydef() output e.g. "created_at"
+	Children      []string // child table names
 }
 
 // RLSDef describes row-level security settings for a table.
@@ -203,3 +205,15 @@ type PolicyDef struct {
 }
 
 func (d PolicyDef) Header() ObjectHeader { return d.ObjectHeader }
+
+// ForeignKeyDef represents a foreign key constraint as an independent object.
+// Separated from TableDef to break circular FK dependencies during restore.
+type ForeignKeyDef struct {
+	ObjectHeader                // Kind=KindForeignKey, Schema=source table schema, Name=constraint name
+	SourceTable  string        // table that owns the FK column(s)
+	TargetSchema string        // referenced table's schema
+	TargetTable  string        // referenced table name
+	Definition   string        // pg_get_constraintdef() output e.g. "FOREIGN KEY (col) REFERENCES other(id)"
+}
+
+func (d ForeignKeyDef) Header() ObjectHeader { return d.ObjectHeader }

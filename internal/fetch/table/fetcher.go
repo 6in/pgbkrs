@@ -270,6 +270,13 @@ func fetchPartitioning(ctx context.Context, conn *pgx.Conn, tableOID uint32) (*c
 
 	stratStr := mapPartStrategy(strat.Partstrat)
 
+	// Step 5a2: get partition key expression
+	var keyExpr string
+	err = conn.QueryRow(ctx, `SELECT pg_get_partkeydef($1)`, tableOID).Scan(&keyExpr)
+	if err != nil {
+		return nil, err
+	}
+
 	// Step 5b: get children
 	childQuery := `
 SELECT child.relname AS name
@@ -295,8 +302,9 @@ WHERE inh.inhparent = $1 ORDER BY child.relname`
 	}
 
 	return &core.PartitionDef{
-		Strategy: stratStr,
-		Children: children,
+		Strategy:      stratStr,
+		KeyExpression: keyExpr,
+		Children:      children,
 	}, nil
 }
 
