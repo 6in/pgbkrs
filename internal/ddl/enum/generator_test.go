@@ -1,40 +1,56 @@
 package enum_test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/pgbkrs/pgbackup/internal/core"
 	"github.com/pgbkrs/pgbackup/internal/ddl/enum"
 )
 
-func TestGenerateDDL(t *testing.T) {
+func TestGenerateDDL_MultipleLabels(t *testing.T) {
 	g := &enum.DDLGenerator{}
-	def := &core.EnumDef{
+	def := core.EnumDef{
 		ObjectHeader: core.ObjectHeader{Kind: core.KindEnum, Schema: "public", Name: "status"},
-		Labels:       []string{"a", "b", "c"},
+		Labels:       []string{"active", "inactive", "deleted"},
 	}
 
 	stmts, err := g.GenerateDDL(def)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(stmts) == 0 {
-		t.Fatal("expected at least one DDL statement")
+	if len(stmts) != 1 {
+		t.Fatalf("expected 1 DDL statement, got %d", len(stmts))
 	}
 
-	combined := strings.Join(stmts, "\n")
-	if !strings.Contains(combined, "CREATE TYPE") {
-		t.Error("expected CREATE TYPE statement")
+	ddl := stmts[0]
+	expected := "CREATE TYPE public.status AS ENUM ('active', 'inactive', 'deleted')"
+	if ddl != expected {
+		t.Errorf("expected:\n  %s\ngot:\n  %s", expected, ddl)
 	}
-	if !strings.Contains(combined, "AS ENUM") {
-		t.Error("expected AS ENUM in output")
+}
+
+func TestGenerateDDL_SingleLabel(t *testing.T) {
+	g := &enum.DDLGenerator{}
+	def := core.EnumDef{
+		ObjectHeader: core.ObjectHeader{Kind: core.KindEnum, Schema: "myschema", Name: "single_enum"},
+		Labels:       []string{"only"},
+	}
+
+	stmts, err := g.GenerateDDL(def)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ddl := stmts[0]
+	expected := "CREATE TYPE myschema.single_enum AS ENUM ('only')"
+	if ddl != expected {
+		t.Errorf("expected:\n  %s\ngot:\n  %s", expected, ddl)
 	}
 }
 
 func TestGenerateDrop(t *testing.T) {
 	g := &enum.DDLGenerator{}
-	def := &core.EnumDef{
+	def := core.EnumDef{
 		ObjectHeader: core.ObjectHeader{Kind: core.KindEnum, Schema: "public", Name: "status"},
 	}
 
@@ -42,17 +58,36 @@ func TestGenerateDrop(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(stmts) == 0 {
-		t.Fatal("expected at least one DDL statement")
+	if len(stmts) != 1 {
+		t.Fatalf("expected 1 DDL statement, got %d", len(stmts))
 	}
 
-	found := false
-	for _, s := range stmts {
-		if strings.Contains(s, "DROP TYPE IF EXISTS") {
-			found = true
-		}
+	expected := "DROP TYPE IF EXISTS public.status CASCADE"
+	if stmts[0] != expected {
+		t.Errorf("expected %q, got %q", expected, stmts[0])
 	}
-	if !found {
-		t.Error("expected DROP TYPE IF EXISTS statement")
+}
+
+func TestGenerateDDL_WrongType(t *testing.T) {
+	g := &enum.DDLGenerator{}
+	def := core.SequenceDef{
+		ObjectHeader: core.ObjectHeader{Kind: core.KindSequence, Schema: "public", Name: "seq"},
+	}
+
+	_, err := g.GenerateDDL(def)
+	if err == nil {
+		t.Error("expected error for wrong type")
+	}
+}
+
+func TestGenerateDrop_WrongType(t *testing.T) {
+	g := &enum.DDLGenerator{}
+	def := core.SequenceDef{
+		ObjectHeader: core.ObjectHeader{Kind: core.KindSequence, Schema: "public", Name: "seq"},
+	}
+
+	_, err := g.GenerateDrop(def)
+	if err == nil {
+		t.Error("expected error for wrong type")
 	}
 }
