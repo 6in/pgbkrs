@@ -118,7 +118,11 @@ Plans:
   2. Circular FK dependencies do not cause an error — FK constraints are separated into independent objects ordered after all tables
   3. _manifest.yaml is written containing object list, restore_order, dependency graph, skip list, and backup metadata
   4. Kahn's algorithm detects and reports a true (non-FK) circular dependency as an error rather than silently producing a wrong order
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — DAG builder with dependency extraction + Kahn's topological sort with FK isolation and cycle detection
+- [ ] 06-02-PLAN.md — Manifest struct, BuildManifest, WriteManifest, and end-to-end integration tests
 
 ### Phase 7: Backup Orchestration
 **Goal**: Running `pgbackup backup` against a live database produces a complete, correctly structured backup directory that can be used for restore and diff operations
@@ -180,7 +184,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 3. Schema Fetch - Views, Functions, Triggers & Policies | 4/4 | Complete   | 2026-03-11 |
 | 4. DDL Generation | 4/4 | Complete   | 2026-03-11 |
 | 5. Serialization | 0/3 | Not started | - |
-| 6. Dependency Resolution & Manifest | 0/TBD | Not started | - |
+| 6. Dependency Resolution & Manifest | 0/2 | Not started | - |
 | 7. Backup Orchestration | 0/TBD | Not started | - |
 | 8. Restore - Core Pipeline | 0/TBD | Not started | - |
 | 9. Restore - Partial & Safety | 0/TBD | Not started | - |
