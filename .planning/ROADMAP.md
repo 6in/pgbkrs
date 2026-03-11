@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Schema Fetch - Views, Functions, Triggers & Policies** - pg_catalog extraction for views, materialized views, functions, triggers, and RLS policies (completed 2026-03-11)
 - [x] **Phase 4: DDL Generation** - CREATE and DROP DDL generation from fetched definitions for all object types (completed 2026-03-11)
 - [ ] **Phase 5: Serialization** - YAML output for all object types, CSV data export, partition handling, checksums
-- [ ] **Phase 6: Dependency Resolution & Manifest** - In-memory DAG, Kahn topological sort, FK isolation, _manifest.yaml output
+- [x] **Phase 6: Dependency Resolution & Manifest** - In-memory DAG, Kahn topological sort, FK isolation, _manifest.yaml output (completed 2026-03-11)
 - [ ] **Phase 7: Backup Orchestration** - End-to-end backup command: directory structure, skip detection, snapshot mode
 - [ ] **Phase 8: Restore - Core Pipeline** - Pre-backup, DROP cycle, CREATE cycle, data load, sequence restoration, indexes, FK application
 - [ ] **Phase 9: Restore - Partial & Safety** - Granular restore (schema/object scope), dependency chain resolution, drop-leak detection, restore logs
@@ -184,7 +184,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 3. Schema Fetch - Views, Functions, Triggers & Policies | 4/4 | Complete   | 2026-03-11 |
 | 4. DDL Generation | 4/4 | Complete   | 2026-03-11 |
 | 5. Serialization | 0/3 | Not started | - |
-| 6. Dependency Resolution & Manifest | 0/2 | Not started | - |
+| 6. Dependency Resolution & Manifest | 2/2 | Complete   | 2026-03-11 |
 | 7. Backup Orchestration | 0/TBD | Not started | - |
 | 8. Restore - Core Pipeline | 0/TBD | Not started | - |
 | 9. Restore - Partial & Safety | 0/TBD | Not started | - |

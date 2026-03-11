@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-serialization/05-03-PLAN.md
-last_updated: "2026-03-11T14:25:00.237Z"
-last_activity: 2026-03-11 — Completed 05-02 Non-Table Object Serializers
+stopped_at: Completed 06-dependency-resolution-manifest/06-02-PLAN.md
+last_updated: "2026-03-11T14:30:57.094Z"
+last_activity: 2026-03-11 — Completed 06-02 Manifest Writer
 progress:
   total_phases: 10
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 19
-  completed_plans: 18
-  percent: 94
+  completed_plans: 19
+  percent: 95
 ---
 
 # Project State
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-03-11)
 ## Current Position
 
 Phase: 6 of 10 (Dependency Resolution & Manifest)
-Plan: 1 of 2 in current phase
+Plan: 2 of 2 in current phase
 Status: Executing
-Last activity: 2026-03-11 — Completed 06-01 DAG Builder and Topological Sort
+Last activity: 2026-03-11 — Completed 06-02 Manifest Writer
 
 Progress: [██████████] 95%
 
@@ -68,6 +68,7 @@ Progress: [██████████] 95%
 | Phase 05 P02 | 5 | 2 tasks | 20 files |
 | Phase 05-serialization P03 | 2 | 2 tasks | 2 files |
 | Phase 06-dependency-resolution-manifest P01 | 3 | 2 tasks | 4 files |
+| Phase 06 P02 | 3 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -120,6 +121,9 @@ Recent decisions affecting current work:
 - [Phase 06-dependency-resolution-manifest]: Kind-priority tiebreaking in Kahn's sort instead of explicit view->table edges -- simpler and more robust
 - [Phase 06-dependency-resolution-manifest]: inDegree tracks dependency count per node (zero = ready to restore first)
 - [Phase 06-dependency-resolution-manifest]: FKs sorted alphabetically by schema.name when appended for deterministic output
+- [Phase 06]: Object IDs use schema.name format in manifest (not schema.kind.name used internally by DAG)
+- [Phase 06]: BuildManifest delegates to BuildRestoreOrder as single authoritative sort source, builds separate DAG only for edge reading
+- [Phase 06]: FK ObjectEntry uses kind=fk with DependsOn listing both source and target tables
 
 ### Pending Todos
 
@@ -131,6 +135,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T14:24:30Z
-Stopped at: Completed 06-dependency-resolution-manifest/06-01-PLAN.md
+Last session: 2026-03-11T14:30:57.092Z
+Stopped at: Completed 06-dependency-resolution-manifest/06-02-PLAN.md
 Resume file: None
