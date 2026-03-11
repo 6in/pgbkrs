@@ -102,7 +102,12 @@ Plans:
   3. A table's data.csv is written in COPY TO format and can be loaded back via COPY FROM without error
   4. For a partitioned table, the parent produces no data.csv and each child table produces its own data.csv
   5. Each data.csv is accompanied by a sha256 checksum and row count in the manifest metadata
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Wave 0 test stubs for all serializers + table YAML serializer (spec 5.2)
+- [ ] 05-02-PLAN.md — All 10 remaining object serializers (view, matview, function, trigger, sequence, type, domain, enum, policy, foreignkey)
+- [ ] 05-03-PLAN.md — Data exporter: COPY TO CSV with streaming SHA256 checksum, partition detection
 
 ### Phase 6: Dependency Resolution & Manifest
 **Goal**: Given a set of fetched object definitions, the tool builds a dependency DAG, resolves restore order via Kahn's algorithm, isolates FK constraints as independent objects to break circular dependencies, and writes a complete _manifest.yaml
@@ -174,7 +179,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 2. Schema Fetch - Tables & Sequences | 4/4 | Complete   | 2026-03-11 |
 | 3. Schema Fetch - Views, Functions, Triggers & Policies | 4/4 | Complete   | 2026-03-11 |
 | 4. DDL Generation | 4/4 | Complete   | 2026-03-11 |
-| 5. Serialization | 0/TBD | Not started | - |
+| 5. Serialization | 0/3 | Not started | - |
 | 6. Dependency Resolution & Manifest | 0/TBD | Not started | - |
 | 7. Backup Orchestration | 0/TBD | Not started | - |
 | 8. Restore - Core Pipeline | 0/TBD | Not started | - |
