@@ -128,9 +128,9 @@ type yamlData struct {
 }
 
 func (s *Serializer) Serialize(def core.ObjectDef) ([]byte, error) {
-    td, ok := def.(core.TableDef)
+    td, ok := def.(*core.TableDef)
     if !ok {
-        return nil, fmt.Errorf("table.Serializer.Serialize: expected core.TableDef, got %T", def)
+        return nil, fmt.Errorf("table.Serializer.Serialize: expected *core.TableDef, got %T", def)
     }
     yd := toYAML(td)
     return yaml.Marshal(yd)
@@ -209,13 +209,17 @@ func shouldExportData(td *core.TableDef) bool {
 
 ### Pattern 4: Type Assertion Convention
 
-**What:** Table DDL generators use pointer receivers (`*core.TableDef`), but view/etc. generators use value receivers (`core.ViewDef`). This project follows the convention established in Phase 4.
+**What:** DDL generators established the type assertion convention in Phase 4. Each serializer must match its DDL generator counterpart.
 
 **When to use:** All serializers must match the same receiver pattern as their DDL generator counterparts.
 
-**Critical detail from Phase 4 decisions:**
-- Table, Sequence, ForeignKey: pointer type assertion (`*core.TableDef`)
-- View, MatView, Function, Trigger, Type, Domain, Enum, Policy: value type assertion (`core.ViewDef`)
+**Critical detail -- verified against actual DDL generator code:**
+- Table: pointer type assertion `def.(*core.TableDef)` -- from `internal/ddl/table/generator.go`
+- ForeignKey: pointer type assertion `def.(*core.ForeignKeyDef)` -- from `internal/ddl/foreignkey/generator.go`
+- Sequence: value type assertion `def.(core.SequenceDef)` -- from `internal/ddl/sequence/generator.go`
+- View, MatView, Function, Trigger, Type, Domain, Enum, Policy: value type assertion (e.g., `def.(core.ViewDef)`)
+
+**NOTE:** Only Table and ForeignKey use pointer assertions. Sequence uses value assertion despite being a struct with many fields. Always verify against the DDL generator source if uncertain.
 
 ### Anti-Patterns to Avoid
 - **Adding yaml tags directly to core types:** Core types are shared across fetch/ddl/serialize. Adding yaml tags would couple all layers to the on-disk format. Use intermediate YAML-specific structs instead.
@@ -238,8 +242,8 @@ func shouldExportData(td *core.TableDef) bool {
 
 ### Pitfall 1: Value vs Pointer Type Assertions
 **What goes wrong:** `def.(core.TableDef)` fails when `def` is `*core.TableDef` (and vice versa)
-**Why it happens:** Phase 4 established that TableDef uses pointer receivers but ViewDef uses value receivers. Inconsistency across kinds.
-**How to avoid:** Check the DDL generator for each kind to see which convention it uses. Table/Sequence/ForeignKey use `*core.XxxDef`; all others use `core.XxxDef`.
+**Why it happens:** Phase 4 established different conventions per kind. Most use value receivers, but Table and ForeignKey use pointer receivers.
+**How to avoid:** Check the DDL generator for each kind to see which convention it uses. Table and ForeignKey use `*core.XxxDef`; all others (including Sequence) use `core.XxxDef`.
 **Warning signs:** Runtime panic or "expected X, got Y" error in type assertion.
 
 ### Pitfall 2: YAML Field Name Mismatch with Spec

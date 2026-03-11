@@ -38,22 +38,22 @@ created: 2026-03-11
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 05-01-01 | 01 | 0 | SRLZ-01 | unit | `go test ./internal/serialize/table/... -run TestSerialize` | ❌ W0 | ⬜ pending |
-| 05-01-02 | 01 | 0 | SRLZ-01 | unit | `go test ./internal/serialize/table/... -run TestDeserialize` | ❌ W0 | ⬜ pending |
-| 05-01-03 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/view/... -run TestSerialize` | ❌ W0 | ⬜ pending |
-| 05-01-04 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/matview/... -run TestSerialize` | ❌ W0 | ⬜ pending |
-| 05-01-05 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/function/... -run TestSerialize` | ❌ W0 | ⬜ pending |
-| 05-01-06 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/trigger/... -run TestSerialize` | ❌ W0 | ⬜ pending |
-| 05-01-07 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/sequence/... -run TestSerialize` | ❌ W0 | ⬜ pending |
-| 05-01-08 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/compositetype/... -run TestSerialize` | ❌ W0 | ⬜ pending |
-| 05-01-09 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/domain/... -run TestSerialize` | ❌ W0 | ⬜ pending |
-| 05-01-10 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/enum/... -run TestSerialize` | ❌ W0 | ⬜ pending |
-| 05-01-11 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/policy/... -run TestSerialize` | ❌ W0 | ⬜ pending |
-| 05-02-01 | 02 | 0 | SRLZ-03 | integration | `go test ./internal/export/... -run TestExportTableData` | ❌ W0 | ⬜ pending |
-| 05-02-02 | 02 | 0 | SRLZ-04 | unit+integration | `go test ./internal/export/... -run TestPartition` | ❌ W0 | ⬜ pending |
-| 05-02-03 | 02 | 0 | SRLZ-05 | unit | `go test ./internal/export/... -run TestChecksum` | ❌ W0 | ⬜ pending |
+| 05-01-01 | 01 | 0 | SRLZ-01 | unit | `go test ./internal/serialize/table/... -run TestSerialize` | W0 | pending |
+| 05-01-02 | 01 | 0 | SRLZ-01 | unit | `go test ./internal/serialize/table/... -run TestDeserialize` | W0 | pending |
+| 05-01-03 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/view/... -run TestSerialize` | W0 | pending |
+| 05-01-04 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/matview/... -run TestSerialize` | W0 | pending |
+| 05-01-05 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/function/... -run TestSerialize` | W0 | pending |
+| 05-01-06 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/trigger/... -run TestSerialize` | W0 | pending |
+| 05-01-07 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/sequence/... -run TestSerialize` | W0 | pending |
+| 05-01-08 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/compositetype/... -run TestSerialize` | W0 | pending |
+| 05-01-09 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/domain/... -run TestSerialize` | W0 | pending |
+| 05-01-10 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/enum/... -run TestSerialize` | W0 | pending |
+| 05-01-11 | 01 | 0 | SRLZ-02 | unit | `go test ./internal/serialize/policy/... -run TestSerialize` | W0 | pending |
+| 05-01-12 | 01 | 0 | SRLZ-03 | integration | `go test ./internal/export/... -run TestExportTableData` | W0 | pending |
+| 05-01-13 | 01 | 0 | SRLZ-04 | unit+integration | `go test ./internal/export/... -run TestPartition` | W0 | pending |
+| 05-01-14 | 01 | 0 | SRLZ-05 | unit | `go test ./internal/export/... -run TestChecksum` | W0 | pending |
 
-*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+*Status: pending / green / red / flaky*
 
 ---
 
