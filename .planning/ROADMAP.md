@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Project scaffold, CLI subcommands, DB connection, command pattern interfaces (completed 2026-03-11)
 - [ ] **Phase 2: Schema Fetch - Tables & Sequences** - pg_catalog extraction for tables, sequences, composite types, domains, and ENUMs
-- [ ] **Phase 3: Schema Fetch - Views, Functions, Triggers & Policies** - pg_catalog extraction for views, materialized views, functions, triggers, and RLS policies
+- [x] **Phase 3: Schema Fetch - Views, Functions, Triggers & Policies** - pg_catalog extraction for views, materialized views, functions, triggers, and RLS policies (completed 2026-03-11)
 - [ ] **Phase 4: DDL Generation** - CREATE and DROP DDL generation from fetched definitions for all object types
 - [ ] **Phase 5: Serialization** - YAML output for all object types, CSV data export, partition handling, checksums
 - [ ] **Phase 6: Dependency Resolution & Manifest** - In-memory DAG, Kahn topological sort, FK isolation, _manifest.yaml output
@@ -166,7 +166,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete   | 2026-03-11 |
 | 2. Schema Fetch - Tables & Sequences | 4/4 | Complete   | 2026-03-11 |
-| 3. Schema Fetch - Views, Functions, Triggers & Policies | 0/4 | Not started | - |
+| 3. Schema Fetch - Views, Functions, Triggers & Policies | 4/4 | Complete   | 2026-03-11 |
 | 4. DDL Generation | 0/TBD | Not started | - |
 | 5. Serialization | 0/TBD | Not started | - |
 | 6. Dependency Resolution & Manifest | 0/TBD | Not started | - |

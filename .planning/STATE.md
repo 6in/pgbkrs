@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-schema-fetch-views-functions-triggers-policies/03-01-PLAN.md
-last_updated: "2026-03-11T08:39:34.426Z"
-last_activity: 2026-03-11 — Roadmap created, 47 requirements mapped across 10 phases
+stopped_at: Completed 03-schema-fetch-views-functions-triggers-policies/03-02-PLAN.md
+last_updated: "2026-03-11T08:43:32.734Z"
+last_activity: 2026-03-11 — Completed 03-01 types expansion + test stubs
 progress:
   total_phases: 10
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 10
-  completed_plans: 7
-  percent: 0
+  completed_plans: 10
+  percent: 70
 ---
 
 # Project State
@@ -57,6 +57,9 @@ Progress: [███████░░░] 70%
 | Phase 02-schema-fetch-tables-sequences P04 | 2 | 2 tasks | 4 files |
 | Phase 02-schema-fetch-tables-sequences P02 | 2 | 1 task | 2 files |
 | Phase 03-schema-fetch-views-functions-triggers-policies P01 | 3 | 2 tasks | 8 files |
+| Phase 03 P04 | 1 | 1 tasks | 1 files |
+| Phase 03 P03 | 2 | 2 tasks | 2 files |
+| Phase 03 P02 | 1 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -81,6 +84,10 @@ Recent decisions affecting current work:
 - [Phase 02-schema-fetch-tables-sequences]: TableSchemaFetcher uses N+1 query pattern (columns/constraints/indexes/partitioning per table) — acceptable for CLI tool; PK columns parsed from pg_get_constraintdef output rather than conkey join
 - [Phase 03-schema-fetch-views-functions-triggers-policies]: Phase 3 DDL added as separate fmt.Sprintf block (ddl2) with %[1]s positional args to avoid numbering conflicts with existing Phase 2 DDL
 - [Phase 03-schema-fetch-views-functions-triggers-policies]: TDD RED/GREEN for struct expansion: types_phase3_test.go verifies all new fields compile and are accessible
+- [Phase 03]: Followed plan exactly: single SQL query with LEFT JOIN LATERAL unnest for role OID resolution
+- [Phase 03]: pg_get_functiondef() for complete CREATE OR REPLACE FUNCTION DDL rather than reconstructing from pg_proc columns
+- [Phase 03]: tgtype bitmask decoded in Go with deterministic event ordering: INSERT, UPDATE, DELETE, TRUNCATE
+- [Phase 03]: Canonical fetcher pattern applied directly to pg_views and pg_matviews -- no query complexity needed for system view-based introspection
 
 ### Pending Todos
 
@@ -92,6 +99,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T08:39:00Z
-Stopped at: Completed 03-schema-fetch-views-functions-triggers-policies/03-01-PLAN.md
+Last session: 2026-03-11T08:43:32.733Z
+Stopped at: Completed 03-schema-fetch-views-functions-triggers-policies/03-02-PLAN.md
 Resume file: None
