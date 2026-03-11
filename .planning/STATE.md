@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 01-foundation/01-02-PLAN.md
-last_updated: "2026-03-11T07:07:29.703Z"
+stopped_at: Completed 02-schema-fetch-tables-sequences/02-01-PLAN.md
+last_updated: "2026-03-11T07:32:32.224Z"
 last_activity: 2026-03-11 — Roadmap created, 47 requirements mapped across 10 phases
 progress:
   total_phases: 10
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  total_plans: 6
+  completed_plans: 3
   percent: 0
 ---
 
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 01-foundation P01 | 3 | 2 tasks | 7 files |
 | Phase 01-foundation P02 | 2 | 2 tasks | 9 files |
+| Phase 02-schema-fetch-tables-sequences P01 | 2 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,8 @@ Recent decisions affecting current work:
 - [Phase 01-foundation]: PersistentPreRunE on rootCmd for fail-fast DB connection inherited by all subcommands
 - [Phase 01-foundation]: Package-level *pgx.Conn in cmd package (not context.Context) for simplicity in sequential CLI
 - [Phase 01-foundation]: SilenceUsage/SilenceErrors on rootCmd — DB errors should not dump usage to screen
+- [Phase 02-schema-fetch-tables-sequences]: TableDef fully-specified with ColumnDef/ConstraintsDef/IndexDef/PartitionDef/RLSDef; SequenceDef with int64 numeric fields + IsCalled bool; TypeDef with Fields []CompositeField; DomainDef with BaseType/Nullable/Default/CheckName/CheckDefinition; EnumDef with Labels []string
+- [Phase 02-schema-fetch-tables-sequences]: Test-first scaffolding: integration test stubs written before production fetcher code (Nyquist); TestFetchXxx stubs reference forward-declared SchemaFetcher until Wave 2
 
 ### Pending Todos
 
@@ -79,6 +82,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T07:04:47.186Z
-Stopped at: Completed 01-foundation/01-02-PLAN.md
+Last session: 2026-03-11T07:32:32.222Z
+Stopped at: Completed 02-schema-fetch-tables-sequences/02-01-PLAN.md
 Resume file: None
