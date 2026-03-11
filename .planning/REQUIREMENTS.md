@@ -7,8 +7,8 @@
 
 ### Foundation
 
-- [ ] **FOUND-01**: Goプロジェクト構成（cmd/internal構造）とサブコマンドCLI（backup/restore/diff）のセットアップ
-- [ ] **FOUND-02**: PostgreSQL接続（--host, --port, --user, --password, --dbname フラグ）
+- [x] **FOUND-01**: Goプロジェクト構成（cmd/internal構造）とサブコマンドCLI（backup/restore/diff）のセットアップ
+- [x] **FOUND-02**: PostgreSQL接続（--host, --port, --user, --password, --dbname フラグ）
 - [x] **FOUND-03**: コマンドパターン基盤（ObjectDef, SchemaFetcher, Serializer, DDLGenerator インターフェース）
 - [x] **FOUND-04**: CommandRegistryによるオブジェクト種別→コマンド解決
 
@@ -101,8 +101,8 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | Phase 1 | Pending |
-| FOUND-02 | Phase 1 | Pending |
+| FOUND-01 | Phase 1 | Complete |
+| FOUND-02 | Phase 1 | Complete |
 | FOUND-03 | Phase 1 | Complete |
 | FOUND-04 | Phase 1 | Complete |
 | FETCH-01 | Phase 2 | Pending |
