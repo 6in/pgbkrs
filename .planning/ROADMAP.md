@@ -133,7 +133,11 @@ Plans:
   2. Tables containing bytea, xml, pg_lsn, or txid_snapshot columns are skipped and appear in a warnings log
   3. Running with `--snapshot` wraps all fetching in a single transaction (REPEATABLE READ) and the manifest records snapshot mode
   4. Running without `--snapshot` (default) fetches each object independently and the manifest records non-snapshot mode
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Test stubs + skip detection helper + core.TableDef DataMeta field + table serializer update + RunBackup orchestrator (non-snapshot path)
+- [ ] 07-02-PLAN.md — Snapshot mode (RepeatableRead tx + tx.Conn()) + CLI flag wiring (--snapshot, --output) + integration tests
 
 ### Phase 8: Restore - Core Pipeline
 **Goal**: Running `pgbackup restore` against a backup directory fully reconstructs the database — dropping existing objects in reverse order, creating them in dependency order, loading data, restoring sequence values, creating indexes, and applying FK constraints as a final batch
@@ -185,7 +189,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 4. DDL Generation | 4/4 | Complete   | 2026-03-11 |
 | 5. Serialization | 0/3 | Not started | - |
 | 6. Dependency Resolution & Manifest | 2/2 | Complete   | 2026-03-11 |
-| 7. Backup Orchestration | 0/TBD | Not started | - |
+| 7. Backup Orchestration | 0/2 | Not started | - |
 | 8. Restore - Core Pipeline | 0/TBD | Not started | - |
 | 9. Restore - Partial & Safety | 0/TBD | Not started | - |
 | 10. Schema Diff | 0/TBD | Not started | - |
