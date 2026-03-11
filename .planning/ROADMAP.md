@@ -168,7 +168,12 @@ Plans:
   3. If a dependency object is not present in the backup, restore stops with a clear error identifying the missing object
   4. After the DROP phase, any object that still exists in the database is reported as a drop-leak warning
   5. drop.log, restore.log, and summary.log are written at the end of every restore run
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 09-01-PLAN.md — filter.go + leak.go + logger.go + Options struct refactor (Wave 1)
+- [ ] 09-02-PLAN.md — Wire filter/leak/logger into RunRestore pipeline + integration tests (Wave 2)
+- [ ] 09-03-PLAN.md — CLI flags --schema, --object, --log-dir + human verify checkpoint (Wave 3)
 
 ### Phase 10: Schema Diff
 **Goal**: Running `pgbackup diff <backup-a> <backup-b>` compares the two backup directories at the schema level and prints a structured, human-readable diff showing added, removed, and modified objects
@@ -196,5 +201,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 6. Dependency Resolution & Manifest | 2/2 | Complete   | 2026-03-11 |
 | 7. Backup Orchestration | 2/2 | Complete   | 2026-03-11 |
 | 8. Restore - Core Pipeline | 3/3 | Complete   | 2026-03-11 |
-| 9. Restore - Partial & Safety | 0/TBD | Not started | - |
+| 9. Restore - Partial & Safety | 0/3 | Not started | - |
 | 10. Schema Diff | 0/TBD | Not started | - |
