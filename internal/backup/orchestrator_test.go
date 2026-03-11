@@ -1,18 +1,23 @@
 package backup
 
 import (
+	"context"
+	"os"
+	"path/filepath"
 	"testing"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/pgbkrs/pgbackup/internal/core"
+	"go.yaml.in/yaml/v3"
 )
 
 // TestSkipUnsupportedColumns verifies that skipReason correctly identifies all
 // unsupported column types including array variants.
 func TestSkipUnsupportedColumns(t *testing.T) {
 	tests := []struct {
-		name        string
-		columns     []core.ColumnDef
-		wantSkipped bool
+		name         string
+		columns      []core.ColumnDef
+		wantSkipped  bool
 		wantContains string // substring expected in reason when wantSkipped=true
 	}{
 		{
@@ -122,19 +127,176 @@ func TestSkipWarning(t *testing.T) {
 	}
 }
 
-// TestOrchestratorDirectoryLayout is an integration test requiring a live database.
-func TestOrchestratorDirectoryLayout(t *testing.T) {
-	t.Skip("integration: requires live DB")
+// connectTestDB connects to the database specified by TEST_DATABASE_URL.
+// It skips the test if the env var is not set.
+func connectTestDB(t *testing.T) *pgx.Conn {
+	t.Helper()
+	dsn := os.Getenv("TEST_DATABASE_URL")
+	if dsn == "" {
+		t.Skip("TEST_DATABASE_URL not set; skipping integration test")
+	}
+	ctx := context.Background()
+	conn, err := pgx.Connect(ctx, dsn)
+	if err != nil {
+		t.Fatalf("pgx.Connect: %v", err)
+	}
+	t.Cleanup(func() { conn.Close(ctx) })
+	return conn
 }
 
-// TestSnapshotMode is an integration test for snapshot backup mode.
-func TestSnapshotMode(t *testing.T) {
-	t.Skip("integration: requires live DB")
+// parseManifest reads the _manifest.yaml from backupRoot and returns it as a
+// map[string]interface{} for field assertions.
+func parseManifest(t *testing.T, backupRoot string) map[string]interface{} {
+	t.Helper()
+	manifestPath := filepath.Join(backupRoot, "_manifest.yaml")
+	data, err := os.ReadFile(manifestPath)
+	if err != nil {
+		t.Fatalf("read _manifest.yaml: %v", err)
+	}
+	var m map[string]interface{}
+	if err := yaml.Unmarshal(data, &m); err != nil {
+		t.Fatalf("parse _manifest.yaml: %v", err)
+	}
+	return m
 }
 
-// TestNonSnapshotMode is an integration test for non-snapshot backup mode.
-func TestNonSnapshotMode(t *testing.T) {
-	t.Skip("integration: requires live DB")
+// findBackupRoot uses filepath.Glob to find the single backup_* subdirectory
+// created inside outDir by RunBackup.
+func findBackupRoot(t *testing.T, outDir string) string {
+	t.Helper()
+	matches, err := filepath.Glob(filepath.Join(outDir, "backup_*"))
+	if err != nil {
+		t.Fatalf("glob backup_*: %v", err)
+	}
+	if len(matches) == 0 {
+		t.Fatalf("no backup_* directory found in %s", outDir)
+	}
+	if len(matches) > 1 {
+		t.Fatalf("expected 1 backup_* directory, got %d: %v", len(matches), matches)
+	}
+	return matches[0]
+}
+
+// TestBackupIntegration is an integration test that runs RunBackup (non-snapshot)
+// against a live database and verifies the backup directory structure.
+func TestBackupIntegration(t *testing.T) {
+	if testing.Short() {
+		t.Skip("integration: skipping in -short mode")
+	}
+	conn := connectTestDB(t)
+	outDir := t.TempDir()
+	ctx := context.Background()
+
+	if err := RunBackup(ctx, conn, outDir, false); err != nil {
+		t.Fatalf("RunBackup: %v", err)
+	}
+
+	backupRoot := findBackupRoot(t, outDir)
+
+	// _manifest.yaml must exist and be valid YAML.
+	m := parseManifest(t, backupRoot)
+
+	// Verify mandatory manifest fields are non-empty.
+	if v, ok := m["backup_at"]; !ok || v == "" {
+		t.Errorf("manifest missing or empty backup_at field; got %v", v)
+	}
+	if v, ok := m["pg_version"]; !ok || v == "" {
+		t.Errorf("manifest missing or empty pg_version field; got %v", v)
+	}
+
+	// At least one schema subdirectory must exist.
+	entries, err := os.ReadDir(backupRoot)
+	if err != nil {
+		t.Fatalf("read backup root: %v", err)
+	}
+	hasSchemDir := false
+	for _, e := range entries {
+		if e.IsDir() {
+			hasSchemDir = true
+			break
+		}
+	}
+	if !hasSchemDir {
+		t.Errorf("expected at least one schema subdirectory in %s, found none", backupRoot)
+	}
+}
+
+// TestBackupSnapshotMode is an integration test that runs RunBackup with
+// snapshot=true and verifies the manifest records snapshot: true.
+func TestBackupSnapshotMode(t *testing.T) {
+	if testing.Short() {
+		t.Skip("integration: skipping in -short mode")
+	}
+	conn := connectTestDB(t)
+	outDir := t.TempDir()
+	ctx := context.Background()
+
+	if err := RunBackup(ctx, conn, outDir, true); err != nil {
+		t.Fatalf("RunBackup(snapshot=true): %v", err)
+	}
+
+	backupRoot := findBackupRoot(t, outDir)
+	m := parseManifest(t, backupRoot)
+
+	// Snapshot field must be present and true.
+	v, ok := m["snapshot"]
+	if !ok {
+		t.Fatalf("manifest missing snapshot field")
+	}
+	snapBool, ok := v.(bool)
+	if !ok {
+		t.Fatalf("manifest snapshot field is not bool: %T(%v)", v, v)
+	}
+	if !snapBool {
+		t.Errorf("manifest snapshot = false; want true for snapshot=true run")
+	}
+
+	// Verify mandatory manifest fields are non-empty.
+	if v, ok := m["backup_at"]; !ok || v == "" {
+		t.Errorf("manifest missing or empty backup_at field; got %v", v)
+	}
+	if v, ok := m["pg_version"]; !ok || v == "" {
+		t.Errorf("manifest missing or empty pg_version field; got %v", v)
+	}
+}
+
+// TestBackupNonSnapshotMode is an integration test that runs RunBackup with
+// snapshot=false and verifies the manifest records snapshot: false.
+func TestBackupNonSnapshotMode(t *testing.T) {
+	if testing.Short() {
+		t.Skip("integration: skipping in -short mode")
+	}
+	conn := connectTestDB(t)
+	outDir := t.TempDir()
+	ctx := context.Background()
+
+	if err := RunBackup(ctx, conn, outDir, false); err != nil {
+		t.Fatalf("RunBackup(snapshot=false): %v", err)
+	}
+
+	backupRoot := findBackupRoot(t, outDir)
+	m := parseManifest(t, backupRoot)
+
+	// Snapshot field must be present and false.
+	v, ok := m["snapshot"]
+	if !ok {
+		t.Fatalf("manifest missing snapshot field")
+	}
+	snapBool, ok := v.(bool)
+	if !ok {
+		t.Fatalf("manifest snapshot field is not bool: %T(%v)", v, v)
+	}
+	if snapBool {
+		t.Errorf("manifest snapshot = true; want false for snapshot=false run")
+	}
+
+	// Verify mandatory manifest fields are non-empty.
+	if v, ok := m["backup_at"]; !ok || v == "" {
+		t.Errorf("manifest missing or empty backup_at field; got %v", v)
+	}
+	if v, ok := m["pg_version"]; !ok || v == "" {
+		t.Errorf("manifest missing or empty pg_version field; got %v", v)
+	}
 }
 
 // containsStr is a helper to check substring presence.
