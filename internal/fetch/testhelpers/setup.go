@@ -34,6 +34,13 @@ func ConnectTestDB(t *testing.T) (*pgx.Conn, func()) {
 //   - Composite type: address_type (street text, city text, zip text)
 //   - Domain: positive_int over integer with CHECK (VALUE > 0)
 //   - ENUM: status_enum ('active', 'inactive', 'pending')
+//   - View: active_items (SELECT from simple_table WHERE price > 0)
+//   - Materialized view: mv_items (SELECT from simple_table)
+//   - Function: add_values(a integer, b integer) RETURNS integer
+//   - Table: audit_log (for trigger target)
+//   - Function: record_audit() RETURNS trigger
+//   - Trigger: trg_audit_simple AFTER INSERT ON simple_table
+//   - Policy: tenant_isolation ON rls_table FOR ALL TO PUBLIC
 func SetupTestSchema(t *testing.T, conn *pgx.Conn) (schema string, teardown func()) {
 	t.Helper()
 	schema = fmt.Sprintf("pgbkrs_test_%d", os.Getpid())
@@ -90,7 +97,47 @@ func SetupTestSchema(t *testing.T, conn *pgx.Conn) (schema string, teardown func
 		schema)
 
 	if _, err := conn.Exec(ctx, ddl); err != nil {
-		t.Fatalf("SetupTestSchema: %v", err)
+		t.Fatalf("SetupTestSchema (phase 2): %v", err)
+	}
+
+	// Phase 3 fixtures: views, functions, triggers, policies
+	ddl2 := fmt.Sprintf(`
+        CREATE VIEW %[1]s.active_items AS
+            SELECT id, email FROM %[1]s.simple_table WHERE price > 0;
+
+        CREATE MATERIALIZED VIEW %[1]s.mv_items AS
+            SELECT id, email FROM %[1]s.simple_table;
+
+        CREATE FUNCTION %[1]s.add_values(a integer, b integer) RETURNS integer
+            LANGUAGE sql AS 'SELECT a + b';
+
+        CREATE TABLE %[1]s.audit_log (
+            id         serial PRIMARY KEY,
+            table_name text,
+            changed_at timestamptz DEFAULT now()
+        );
+
+        CREATE FUNCTION %[1]s.record_audit() RETURNS trigger
+            LANGUAGE plpgsql AS $$
+            BEGIN
+                INSERT INTO %[1]s.audit_log(table_name, changed_at) VALUES (TG_TABLE_NAME, now());
+                RETURN NEW;
+            END;
+            $$;
+
+        CREATE TRIGGER trg_audit_simple
+            AFTER INSERT ON %[1]s.simple_table
+            FOR EACH ROW EXECUTE FUNCTION %[1]s.record_audit();
+
+        CREATE POLICY tenant_isolation ON %[1]s.rls_table
+            FOR ALL
+            TO PUBLIC
+            USING (true)
+            WITH CHECK (true);
+    `, schema)
+
+	if _, err := conn.Exec(ctx, ddl2); err != nil {
+		t.Fatalf("SetupTestSchema (phase 3): %v", err)
 	}
 
 	return schema, func() {
