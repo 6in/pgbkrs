@@ -98,25 +98,34 @@ type TableDef struct {
 func (d TableDef) Header() ObjectHeader { return d.ObjectHeader }
 
 // ViewDef represents a view schema object.
+// Definition contains the SELECT body only (as returned by pg_views.definition).
+// The full CREATE VIEW statement is reconstructed by DDLGenerator in Phase 4.
 type ViewDef struct {
 	ObjectHeader
-	Definition string
+	Definition string // SELECT body from pg_views.definition; NOT a complete DDL statement
+	Owner      string // viewowner from pg_views
 }
 
 func (d ViewDef) Header() ObjectHeader { return d.ObjectHeader }
 
 // MaterializedViewDef represents a materialized view schema object.
+// IsPopulated is false when created WITH NO DATA (REFRESH MATERIALIZED VIEW never run).
 type MaterializedViewDef struct {
 	ObjectHeader
-	Definition string
+	Definition  string // SELECT body from pg_matviews.definition
+	Owner       string // matviewowner from pg_matviews
+	IsPopulated bool   // ispopulated from pg_matviews
 }
 
 func (d MaterializedViewDef) Header() ObjectHeader { return d.ObjectHeader }
 
-// FunctionDef represents a function schema object.
+// FunctionDef represents a function schema object (prokind='f' only; procedures excluded).
+// Definition is the complete CREATE OR REPLACE FUNCTION statement from pg_get_functiondef.
 type FunctionDef struct {
 	ObjectHeader
-	Definition string
+	Definition string // complete CREATE OR REPLACE FUNCTION ... statement
+	ArgTypes   string // pg_get_function_arguments() output e.g. "a integer, b text"
+	ReturnType string // pg_get_function_result() output e.g. "integer"
 }
 
 func (d FunctionDef) Header() ObjectHeader { return d.ObjectHeader }
@@ -136,10 +145,17 @@ type SequenceDef struct {
 
 func (d SequenceDef) Header() ObjectHeader { return d.ObjectHeader }
 
-// TriggerDef represents a trigger schema object.
+// TriggerDef represents a trigger schema object (user-defined only; tgisinternal=false).
+// Timing is one of: "BEFORE", "AFTER", "INSTEAD OF".
+// Events contains one or more of: "INSERT", "UPDATE", "DELETE", "TRUNCATE".
+// TableName is the unqualified name of the trigger's target table.
+// FunctionName is the unqualified name of the trigger function.
 type TriggerDef struct {
 	ObjectHeader
-	Definition string
+	Timing       string   // "BEFORE", "AFTER", or "INSTEAD OF"
+	Events       []string // e.g. ["INSERT", "UPDATE"]
+	TableName    string   // target table (unqualified)
+	FunctionName string   // trigger function name (unqualified)
 }
 
 func (d TriggerDef) Header() ObjectHeader { return d.ObjectHeader }
@@ -172,10 +188,18 @@ type EnumDef struct {
 
 func (d EnumDef) Header() ObjectHeader { return d.ObjectHeader }
 
-// PolicyDef represents a row-level security policy schema object.
+// PolicyDef represents a row-level security policy.
+// Command is one of: "SELECT", "INSERT", "UPDATE", "DELETE", "ALL".
+// Roles contains role names; contains "PUBLIC" when polroles={0}.
+// Using is the USING expression (empty string if none).
+// WithCheck is the WITH CHECK expression (empty string if none).
 type PolicyDef struct {
 	ObjectHeader
-	Definition string
+	TableName string   // target table name (unqualified)
+	Command   string   // "SELECT", "INSERT", "UPDATE", "DELETE", or "ALL"
+	Roles     []string // role names; ["PUBLIC"] when polroles={0}
+	Using     string   // USING expression or empty string
+	WithCheck string   // WITH CHECK expression or empty string
 }
 
 func (d PolicyDef) Header() ObjectHeader { return d.ObjectHeader }
