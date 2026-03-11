@@ -10,9 +10,9 @@ import (
 
 func TestGenerateDDL(t *testing.T) {
 	g := &view.DDLGenerator{}
-	def := &core.ViewDef{
+	def := core.ViewDef{
 		ObjectHeader: core.ObjectHeader{Kind: core.KindView, Schema: "public", Name: "active_users"},
-		Definition:   "SELECT id, name FROM users",
+		Definition:   "SELECT id, name FROM users WHERE active = true",
 		Owner:        "admin",
 	}
 
@@ -20,24 +20,24 @@ func TestGenerateDDL(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(stmts) == 0 {
-		t.Fatal("expected at least one DDL statement")
+	if len(stmts) != 1 {
+		t.Fatalf("expected 1 DDL statement, got %d", len(stmts))
 	}
 
-	found := false
-	for _, s := range stmts {
-		if strings.Contains(s, "CREATE VIEW") && strings.Contains(s, "AS") {
-			found = true
-		}
+	stmt := stmts[0]
+	// Must contain CREATE VIEW schema.name AS
+	if !strings.Contains(stmt, "CREATE VIEW public.active_users AS") {
+		t.Errorf("expected CREATE VIEW public.active_users AS, got: %s", stmt)
 	}
-	if !found {
-		t.Error("expected CREATE VIEW ... AS statement")
+	// Must contain the definition body
+	if !strings.Contains(stmt, "SELECT id, name FROM users WHERE active = true") {
+		t.Errorf("expected SELECT body in DDL, got: %s", stmt)
 	}
 }
 
 func TestGenerateDrop(t *testing.T) {
 	g := &view.DDLGenerator{}
-	def := &core.ViewDef{
+	def := core.ViewDef{
 		ObjectHeader: core.ObjectHeader{Kind: core.KindView, Schema: "public", Name: "active_users"},
 	}
 
@@ -45,17 +45,36 @@ func TestGenerateDrop(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(stmts) == 0 {
-		t.Fatal("expected at least one DDL statement")
+	if len(stmts) != 1 {
+		t.Fatalf("expected 1 DDL statement, got %d", len(stmts))
 	}
 
-	found := false
-	for _, s := range stmts {
-		if strings.Contains(s, "DROP VIEW IF EXISTS") {
-			found = true
-		}
+	expected := "DROP VIEW IF EXISTS public.active_users CASCADE"
+	if stmts[0] != expected {
+		t.Errorf("expected %q, got %q", expected, stmts[0])
 	}
-	if !found {
-		t.Error("expected DROP VIEW IF EXISTS statement")
+}
+
+func TestGenerateDDL_WrongType(t *testing.T) {
+	g := &view.DDLGenerator{}
+	def := core.TableDef{
+		ObjectHeader: core.ObjectHeader{Kind: core.KindTable, Schema: "public", Name: "users"},
+	}
+
+	_, err := g.GenerateDDL(def)
+	if err == nil {
+		t.Fatal("expected error for wrong type input")
+	}
+}
+
+func TestGenerateDrop_WrongType(t *testing.T) {
+	g := &view.DDLGenerator{}
+	def := core.TableDef{
+		ObjectHeader: core.ObjectHeader{Kind: core.KindTable, Schema: "public", Name: "users"},
+	}
+
+	_, err := g.GenerateDrop(def)
+	if err == nil {
+		t.Fatal("expected error for wrong type input")
 	}
 }
