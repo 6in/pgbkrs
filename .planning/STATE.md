@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 07-backup-orchestration/07-01-PLAN.md
-last_updated: "2026-03-11T14:56:10.573Z"
+stopped_at: Completed 07-backup-orchestration/07-02-PLAN.md
+last_updated: "2026-03-11T15:01:29.533Z"
 last_activity: 2026-03-11 — Completed 06-02 Manifest Writer
 progress:
   total_phases: 10
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 21
-  completed_plans: 20
+  completed_plans: 21
   percent: 95
 ---
 
@@ -70,6 +70,7 @@ Progress: [██████████] 95%
 | Phase 06-dependency-resolution-manifest P01 | 3 | 2 tasks | 4 files |
 | Phase 06 P02 | 3 | 2 tasks | 3 files |
 | Phase 07-backup-orchestration P01 | 3 | 2 tasks | 5 files |
+| Phase 07-backup-orchestration P02 | 3 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -127,6 +128,8 @@ Recent decisions affecting current work:
 - [Phase 06]: FK ObjectEntry uses kind=fk with DependsOn listing both source and target tables
 - [Phase 07-backup-orchestration]: TableDataMeta defined in core (not export) to avoid import cycles — orchestrator imports both core and export packages
 - [Phase 07-backup-orchestration]: skipReason() uses strings.Contains to detect array variants (bytea[] matches bytea check); pointer receiver required for fetchTable.SchemaFetcher
+- [Phase 07-backup-orchestration]: queryConn threads tx.Conn() or conn through all fetches/COPY TO — single change point for snapshot mode without altering function signatures
+- [Phase 07-backup-orchestration]: Integration tests skip on absent TEST_DATABASE_URL rather than fail — supports CI without live DB requirement
 
 ### Pending Todos
 
@@ -138,6 +141,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T14:56:10.571Z
-Stopped at: Completed 07-backup-orchestration/07-01-PLAN.md
+Last session: 2026-03-11T15:01:29.531Z
+Stopped at: Completed 07-backup-orchestration/07-02-PLAN.md
 Resume file: None
