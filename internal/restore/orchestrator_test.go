@@ -63,7 +63,10 @@ func TestPreRestoreBackup(t *testing.T) {
 	setupBackupDir(ctx, t, conn, backupDir)
 
 	// Run restore — should create a pre-restore backup in preBackupDir
-	err = restore.RunRestore(ctx, conn, findBackupSubdir(t, backupDir), preBackupDir)
+	err = restore.RunRestore(ctx, conn, restore.Options{
+		BackupDir:    findBackupSubdir(t, backupDir),
+		PreBackupDir: preBackupDir,
+	})
 	if err != nil {
 		t.Fatalf("RunRestore: %v", err)
 	}
@@ -111,7 +114,10 @@ func TestRestoreCreateOrder(t *testing.T) {
 		t.Fatalf("drop: %v", err)
 	}
 
-	if err := restore.RunRestore(ctx, conn, findBackupSubdir(t, backupDir), preBackupDir); err != nil {
+	if err := restore.RunRestore(ctx, conn, restore.Options{
+		BackupDir:    findBackupSubdir(t, backupDir),
+		PreBackupDir: preBackupDir,
+	}); err != nil {
 		t.Fatalf("RunRestore: %v", err)
 	}
 
@@ -155,7 +161,10 @@ func TestRestoreCopyFrom(t *testing.T) {
 	if _, err := conn.Exec(ctx, `DROP TABLE IF EXISTS rest05_test CASCADE`); err != nil {
 		t.Fatalf("drop: %v", err)
 	}
-	if err := restore.RunRestore(ctx, conn, findBackupSubdir(t, backupDir), preBackupDir); err != nil {
+	if err := restore.RunRestore(ctx, conn, restore.Options{
+		BackupDir:    findBackupSubdir(t, backupDir),
+		PreBackupDir: preBackupDir,
+	}); err != nil {
 		t.Fatalf("RunRestore: %v", err)
 	}
 
@@ -204,7 +213,10 @@ func TestRestoreSetval(t *testing.T) {
 	if _, err := conn.Exec(ctx, `DROP TABLE IF EXISTS rest06_test CASCADE`); err != nil {
 		t.Fatalf("drop: %v", err)
 	}
-	if err := restore.RunRestore(ctx, conn, findBackupSubdir(t, backupDir), preBackupDir); err != nil {
+	if err := restore.RunRestore(ctx, conn, restore.Options{
+		BackupDir:    findBackupSubdir(t, backupDir),
+		PreBackupDir: preBackupDir,
+	}); err != nil {
 		t.Fatalf("RunRestore: %v", err)
 	}
 
@@ -246,7 +258,10 @@ func TestRestoreIndexes(t *testing.T) {
 	if _, err := conn.Exec(ctx, `DROP TABLE IF EXISTS rest07_test CASCADE`); err != nil {
 		t.Fatalf("drop: %v", err)
 	}
-	if err := restore.RunRestore(ctx, conn, findBackupSubdir(t, backupDir), preBackupDir); err != nil {
+	if err := restore.RunRestore(ctx, conn, restore.Options{
+		BackupDir:    findBackupSubdir(t, backupDir),
+		PreBackupDir: preBackupDir,
+	}); err != nil {
 		t.Fatalf("RunRestore: %v", err)
 	}
 
@@ -297,7 +312,10 @@ func TestRestoreFKBatch(t *testing.T) {
 	if _, err := conn.Exec(ctx, `DROP TABLE IF EXISTS rest08_parent CASCADE`); err != nil {
 		t.Fatalf("drop parent: %v", err)
 	}
-	if err := restore.RunRestore(ctx, conn, findBackupSubdir(t, backupDir), preBackupDir); err != nil {
+	if err := restore.RunRestore(ctx, conn, restore.Options{
+		BackupDir:    findBackupSubdir(t, backupDir),
+		PreBackupDir: preBackupDir,
+	}); err != nil {
 		t.Fatalf("RunRestore: %v", err)
 	}
 
@@ -353,7 +371,10 @@ func TestRestoreViewsFunctions(t *testing.T) {
 	if _, err := conn.Exec(ctx, `DROP TABLE IF EXISTS rest09_base CASCADE`); err != nil {
 		t.Fatalf("drop base: %v", err)
 	}
-	if err := restore.RunRestore(ctx, conn, findBackupSubdir(t, backupDir), preBackupDir); err != nil {
+	if err := restore.RunRestore(ctx, conn, restore.Options{
+		BackupDir:    findBackupSubdir(t, backupDir),
+		PreBackupDir: preBackupDir,
+	}); err != nil {
 		t.Fatalf("RunRestore: %v", err)
 	}
 
@@ -365,6 +386,30 @@ func TestRestoreViewsFunctions(t *testing.T) {
 	if !viewExists {
 		t.Error("expected rest09_view to exist after restore")
 	}
+}
+
+// TestDropLeakDetection is a stub for REST-03 integration test (Plan 02).
+func TestDropLeakDetection(t *testing.T) {
+	t.Skip("integration only — REST-03 leak detection full wiring in Plan 02")
+	t.Log("Verifies that objects remaining after DROP wave that were in restore_order are reported as leaks")
+}
+
+// TestSchemaScoped is a stub for REST-10 integration test (Plan 02).
+func TestSchemaScoped(t *testing.T) {
+	t.Skip("integration only — REST-10 schema-scoped restore in Plan 02")
+	t.Log("Verifies that opts.Schema filters restore to only objects in the specified schema")
+}
+
+// TestObjectScopedTransitive is a stub for REST-11 integration test (Plan 02).
+func TestObjectScopedTransitive(t *testing.T) {
+	t.Skip("integration only — REST-11 object-scoped transitive restore in Plan 02")
+	t.Log("Verifies that opts.Object triggers BFS transitive closure and restores all dependencies")
+}
+
+// TestLogFiles is a stub for REST-13 integration test (Plan 02).
+func TestLogFiles(t *testing.T) {
+	t.Skip("integration only — REST-13 log file creation in Plan 02")
+	t.Log("Verifies that drop.log, restore.log, and summary.log are created in opts.LogDir")
 }
 
 // findBackupSubdir finds the single backup subdirectory created by RunBackup.

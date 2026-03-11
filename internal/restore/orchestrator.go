@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 
@@ -15,8 +16,8 @@ import (
 	"github.com/pgbkrs/pgbackup/internal/resolve"
 )
 
-// RunRestore executes a full restore from backupDir to the connected database.
-// preBackupDir is the directory where the pre-restore safety backup will be written.
+// RunRestore executes a full restore from opts.BackupDir to the connected database.
+// opts.PreBackupDir is the directory where the pre-restore safety backup will be written.
 //
 // Pipeline waves:
 //
@@ -28,24 +29,100 @@ import (
 //	5. CREATE non-PK indexes from IndexDef.Definition (REST-07)
 //	6. ADD FK constraints as a batch (REST-08)
 //	7. CREATE views, mat views, functions, triggers, policies (REST-09)
-func RunRestore(ctx context.Context, conn *pgx.Conn, backupDir, preBackupDir string) error {
+func RunRestore(ctx context.Context, conn *pgx.Conn, opts Options) error {
+	// Resolve log directory default
+	logDir := opts.LogDir
+	if logDir == "" {
+		logDir = "."
+	}
+
+	// Initialize logger
+	logger, err := NewLogger(logDir)
+	if err != nil {
+		// Non-fatal: log to stderr and continue without file logging
+		fmt.Fprintf(os.Stderr, "restore: failed to create logger: %v\n", err)
+		logger = nil
+	}
+
+	var restoreErr error
+	startTime := time.Now()
+	defer func() {
+		if logger != nil {
+			elapsed := time.Since(startTime)
+			logger.WriteSummary(logger.dropCount, logger.restoreCount, logger.warnCount, elapsed, restoreErr)
+			_ = logger.Close()
+		}
+	}()
+
 	// Wave 0: Pre-restore backup (REST-01)
-	if err := backup.RunBackup(ctx, conn, preBackupDir, false); err != nil {
-		return fmt.Errorf("pre-restore backup: %w", err)
+	if err := backup.RunBackup(ctx, conn, opts.PreBackupDir, false); err != nil {
+		restoreErr = fmt.Errorf("pre-restore backup: %w", err)
+		return restoreErr
 	}
 
 	// Load manifest
-	manifestPath := filepath.Join(backupDir, "_manifest.yaml")
+	manifestPath := filepath.Join(opts.BackupDir, "_manifest.yaml")
 	manifest, err := resolve.ReadManifest(manifestPath)
 	if err != nil {
-		return fmt.Errorf("load manifest: %w", err)
+		restoreErr = fmt.Errorf("load manifest: %w", err)
+		return restoreErr
+	}
+
+	// Determine the scoped restore order
+	restoreOrder, err := filteredRestoreOrder(manifest, opts)
+	if err != nil {
+		restoreErr = fmt.Errorf("filter restore order: %w", err)
+		return restoreErr
+	}
+
+	// Build shouldBeDropped set from restore order
+	shouldBeDropped := make(map[string]bool, len(restoreOrder))
+	for _, entry := range restoreOrder {
+		shouldBeDropped[entry.Schema+"."+entry.Name] = true
+	}
+
+	// Snapshot live objects before DROP wave (REST-03 leak detection stub)
+	// Collect unique schemas from restoreOrder
+	schemaSet := make(map[string]bool)
+	for _, entry := range restoreOrder {
+		schemaSet[entry.Schema] = true
+	}
+	schemas := make([]string, 0, len(schemaSet))
+	for s := range schemaSet {
+		schemas = append(schemas, s)
+	}
+
+	preDrop, snapErr := snapshotLiveObjects(ctx, conn, schemas)
+	if snapErr != nil {
+		fmt.Fprintf(os.Stderr, "restore: pre-drop snapshot failed (continuing): %v\n", snapErr)
+		preDrop = nil
 	}
 
 	// Wave 1: DROP in reverse restore_order (REST-02)
-	for i := len(manifest.RestoreOrder) - 1; i >= 0; i-- {
-		entry := manifest.RestoreOrder[i]
-		if err := execDrop(ctx, conn, backupDir, entry); err != nil {
-			return fmt.Errorf("drop %s %s.%s: %w", entry.Kind, entry.Schema, entry.Name, err)
+	for i := len(restoreOrder) - 1; i >= 0; i-- {
+		entry := restoreOrder[i]
+		if err := execDrop(ctx, conn, opts.BackupDir, entry); err != nil {
+			restoreErr = fmt.Errorf("drop %s %s.%s: %w", entry.Kind, entry.Schema, entry.Name, err)
+			return restoreErr
+		}
+		if logger != nil {
+			logger.LogDrop(entry.Schema, entry.Kind, entry.Name, nil)
+		}
+	}
+
+	// Snapshot after DROP wave and detect leaks (REST-03)
+	if preDrop != nil {
+		postDrop, snapErr := snapshotLiveObjects(ctx, conn, schemas)
+		if snapErr != nil {
+			fmt.Fprintf(os.Stderr, "restore: post-drop snapshot failed (continuing): %v\n", snapErr)
+		} else {
+			leaks := detectLeaks(postDrop, shouldBeDropped)
+			for _, leak := range leaks {
+				fmt.Fprintf(os.Stderr, "restore: LEAK detected: %s.%s (kind=%s)\n", leak.Schema, leak.Name, leak.Kind)
+				if logger != nil {
+					logger.LogLeakWarning(leak.Schema, leak.Kind, leak.Name)
+				}
+			}
 		}
 	}
 
@@ -53,13 +130,14 @@ func RunRestore(ctx context.Context, conn *pgx.Conn, backupDir, preBackupDir str
 	schemaWaveKinds := map[string]bool{
 		"table": true, "sequence": true, "type": true, "domain": true, "enum": true,
 	}
-	for _, entry := range manifest.RestoreOrder {
+	for _, entry := range restoreOrder {
 		if !schemaWaveKinds[entry.Kind] {
 			continue
 		}
-		def, err := loadObjectDef(backupDir, entry)
+		def, err := loadObjectDef(opts.BackupDir, entry)
 		if err != nil {
-			return fmt.Errorf("load def for %s.%s: %w", entry.Schema, entry.Name, err)
+			restoreErr = fmt.Errorf("load def for %s.%s: %w", entry.Schema, entry.Name, err)
+			return restoreErr
 		}
 		gen := ddlGeneratorFor(entry.Kind)
 		if gen == nil {
@@ -67,7 +145,8 @@ func RunRestore(ctx context.Context, conn *pgx.Conn, backupDir, preBackupDir str
 		}
 		stmts, err := gen.GenerateDDL(def)
 		if err != nil {
-			return fmt.Errorf("generate DDL for %s.%s: %w", entry.Schema, entry.Name, err)
+			restoreErr = fmt.Errorf("generate DDL for %s.%s: %w", entry.Schema, entry.Name, err)
+			return restoreErr
 		}
 		// For tables: GenerateDDL returns CREATE TABLE + possibly index statements.
 		// In Wave 2, execute only the first statement (CREATE TABLE).
@@ -75,56 +154,69 @@ func RunRestore(ctx context.Context, conn *pgx.Conn, backupDir, preBackupDir str
 		if entry.Kind == "table" {
 			if len(stmts) > 0 {
 				if _, err := conn.Exec(ctx, stmts[0]); err != nil {
-					return fmt.Errorf("create table %s.%s: %w", entry.Schema, entry.Name, err)
+					restoreErr = fmt.Errorf("create table %s.%s: %w", entry.Schema, entry.Name, err)
+					return restoreErr
 				}
+			}
+			if logger != nil {
+				logger.LogRestore(entry.Schema, entry.Kind, entry.Name, nil)
 			}
 			continue
 		}
 		for _, stmt := range stmts {
 			if _, err := conn.Exec(ctx, stmt); err != nil {
-				return fmt.Errorf("exec DDL %s.%s: %w", entry.Schema, entry.Name, err)
+				restoreErr = fmt.Errorf("exec DDL %s.%s: %w", entry.Schema, entry.Name, err)
+				return restoreErr
 			}
+		}
+		if logger != nil {
+			logger.LogRestore(entry.Schema, entry.Kind, entry.Name, nil)
 		}
 	}
 
 	// Wave 3: COPY FROM for table data (REST-05)
-	for _, entry := range manifest.RestoreOrder {
+	for _, entry := range restoreOrder {
 		if entry.Kind != "table" {
 			continue
 		}
-		if err := copyFromTable(ctx, conn, backupDir, entry); err != nil {
-			return fmt.Errorf("copy from %s.%s: %w", entry.Schema, entry.Name, err)
+		if err := copyFromTable(ctx, conn, opts.BackupDir, entry); err != nil {
+			restoreErr = fmt.Errorf("copy from %s.%s: %w", entry.Schema, entry.Name, err)
+			return restoreErr
 		}
 	}
 
 	// Wave 4: SETVAL for sequences after COPY FROM (REST-06)
-	for _, entry := range manifest.RestoreOrder {
+	for _, entry := range restoreOrder {
 		if entry.Kind != "sequence" {
 			continue
 		}
-		def, err := loadObjectDef(backupDir, entry)
+		def, err := loadObjectDef(opts.BackupDir, entry)
 		if err != nil {
-			return fmt.Errorf("load sequence def %s.%s: %w", entry.Schema, entry.Name, err)
+			restoreErr = fmt.Errorf("load sequence def %s.%s: %w", entry.Schema, entry.Name, err)
+			return restoreErr
 		}
 		sd, ok := def.(core.SequenceDef)
 		if !ok {
-			return fmt.Errorf("expected SequenceDef for %s.%s, got %T", entry.Schema, entry.Name, def)
+			restoreErr = fmt.Errorf("expected SequenceDef for %s.%s, got %T", entry.Schema, entry.Name, def)
+			return restoreErr
 		}
 		sql := fmt.Sprintf(`SELECT setval('%s.%s', %d, %v)`,
 			sd.Schema, sd.Name, sd.LastValue, sd.IsCalled)
 		if _, err := conn.Exec(ctx, sql); err != nil {
-			return fmt.Errorf("setval %s.%s: %w", entry.Schema, entry.Name, err)
+			restoreErr = fmt.Errorf("setval %s.%s: %w", entry.Schema, entry.Name, err)
+			return restoreErr
 		}
 	}
 
 	// Wave 5: CREATE non-PK indexes from IndexDef.Definition (REST-07)
-	for _, entry := range manifest.RestoreOrder {
+	for _, entry := range restoreOrder {
 		if entry.Kind != "table" {
 			continue
 		}
-		def, err := loadObjectDef(backupDir, entry)
+		def, err := loadObjectDef(opts.BackupDir, entry)
 		if err != nil {
-			return fmt.Errorf("load table def for indexes %s.%s: %w", entry.Schema, entry.Name, err)
+			restoreErr = fmt.Errorf("load table def for indexes %s.%s: %w", entry.Schema, entry.Name, err)
+			return restoreErr
 		}
 		td, ok := def.(*core.TableDef)
 		if !ok {
@@ -135,18 +227,20 @@ func RunRestore(ctx context.Context, conn *pgx.Conn, backupDir, preBackupDir str
 				continue
 			}
 			if _, err := conn.Exec(ctx, idx.Definition); err != nil {
-				return fmt.Errorf("create index %s on %s.%s: %w", idx.Name, entry.Schema, entry.Name, err)
+				restoreErr = fmt.Errorf("create index %s on %s.%s: %w", idx.Name, entry.Schema, entry.Name, err)
+				return restoreErr
 			}
 		}
 	}
 
 	// Wave 6: FK batch — all "fk" entries (REST-08)
-	for _, entry := range manifest.RestoreOrder {
+	for _, entry := range restoreOrder {
 		if entry.Kind != "fk" {
 			continue
 		}
 		if err := execFKCreate(ctx, conn, entry); err != nil {
-			return fmt.Errorf("apply FK %s.%s: %w", entry.Schema, entry.Name, err)
+			restoreErr = fmt.Errorf("apply FK %s.%s: %w", entry.Schema, entry.Name, err)
+			return restoreErr
 		}
 	}
 
@@ -154,13 +248,14 @@ func RunRestore(ctx context.Context, conn *pgx.Conn, backupDir, preBackupDir str
 	remainderKinds := map[string]bool{
 		"view": true, "materialized_view": true, "function": true, "trigger": true, "policy": true,
 	}
-	for _, entry := range manifest.RestoreOrder {
+	for _, entry := range restoreOrder {
 		if !remainderKinds[entry.Kind] {
 			continue
 		}
-		def, err := loadObjectDef(backupDir, entry)
+		def, err := loadObjectDef(opts.BackupDir, entry)
 		if err != nil {
-			return fmt.Errorf("load def for %s.%s: %w", entry.Schema, entry.Name, err)
+			restoreErr = fmt.Errorf("load def for %s.%s: %w", entry.Schema, entry.Name, err)
+			return restoreErr
 		}
 		gen := ddlGeneratorFor(entry.Kind)
 		if gen == nil {
@@ -168,12 +263,17 @@ func RunRestore(ctx context.Context, conn *pgx.Conn, backupDir, preBackupDir str
 		}
 		stmts, err := gen.GenerateDDL(def)
 		if err != nil {
-			return fmt.Errorf("generate DDL for %s.%s: %w", entry.Schema, entry.Name, err)
+			restoreErr = fmt.Errorf("generate DDL for %s.%s: %w", entry.Schema, entry.Name, err)
+			return restoreErr
 		}
 		for _, stmt := range stmts {
 			if _, err := conn.Exec(ctx, stmt); err != nil {
-				return fmt.Errorf("exec DDL %s.%s: %w", entry.Schema, entry.Name, err)
+				restoreErr = fmt.Errorf("exec DDL %s.%s: %w", entry.Schema, entry.Name, err)
+				return restoreErr
 			}
+		}
+		if logger != nil {
+			logger.LogRestore(entry.Schema, entry.Kind, entry.Name, nil)
 		}
 	}
 
