@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-ddl-generation/04-04-PLAN.md
-last_updated: "2026-03-11T11:56:53.969Z"
-last_activity: 2026-03-11 — Completed 04-04 Sequence, CompositeType, Domain, Enum, Policy DDL Generators
+stopped_at: Completed 05-serialization/05-01-PLAN.md
+last_updated: "2026-03-11T13:29:27.205Z"
+last_activity: 2026-03-11 — Completed 05-01 Table Serializer and Wave 0 Stubs
 progress:
   total_phases: 10
   completed_phases: 4
-  total_plans: 14
-  completed_plans: 14
-  percent: 100
+  total_plans: 17
+  completed_plans: 15
+  percent: 88
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-11)
 
 **Core value:** PostgreSQLのスキーマ構造とデータを人間が読めるYAML+CSV形式でオブジェクト単位にバックアップし、依存関係を自動解決して正しい順序でリストアできること
-**Current focus:** Phase 4 - DDL Generation
+**Current focus:** Phase 5 - Serialization
 
 ## Current Position
 
-Phase: 4 of 10 (DDL Generation)
-Plan: 4 of 4 in current phase (PHASE COMPLETE)
+Phase: 5 of 10 (Serialization)
+Plan: 1 of 3 in current phase
 Status: Executing
-Last activity: 2026-03-11 — Completed 04-04 Sequence, CompositeType, Domain, Enum, Policy DDL Generators
+Last activity: 2026-03-11 — Completed 05-01 Table Serializer and Wave 0 Stubs
 
-Progress: [██████████] 100%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
@@ -64,6 +64,7 @@ Progress: [██████████] 100%
 | Phase 04-ddl-generation P02 | 2 | 2 tasks | 4 files |
 | Phase 04-ddl-generation P03 | 2 | 2 tasks | 8 files |
 | Phase 04-ddl-generation P04 | 3 | 2 tasks | 10 files |
+| Phase 05 P01 | 3 | 2 tasks | 25 files |
 
 ## Accumulated Context
 
@@ -104,6 +105,10 @@ Recent decisions affecting current work:
 - [Phase 04-ddl-generation]: Value receiver type assertions for all 5 remaining generators (SequenceDef, TypeDef, DomainDef, EnumDef, PolicyDef)
 - [Phase 04-ddl-generation]: Policy DROP omits CASCADE per PostgreSQL semantics (policies do not cascade)
 - [Phase 04-ddl-generation]: Domain CheckDefinition passed through verbatim from pg_get_constraintdef (already contains CHECK (...))
+- [Phase 05-serialization]: Intermediate YAML structs in serializer.go decouple YAML format from core types (no yaml tags on core)
+- [Phase 05-serialization]: nullable field always emitted (no omitempty) since false is semantically meaningful
+- [Phase 05-serialization]: Pointer type assertion (*core.TableDef) for table serializer matching DDL generator convention
+- [Phase 05-serialization]: Index YAML includes name and method only; Definition is for DDL passthrough, not YAML output
 
 ### Pending Todos
 
@@ -115,6 +120,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T11:52:36Z
-Stopped at: Completed 04-ddl-generation/04-04-PLAN.md
+Last session: 2026-03-11T13:29:27.202Z
+Stopped at: Completed 05-serialization/05-01-PLAN.md
 Resume file: None
