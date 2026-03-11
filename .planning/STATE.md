@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Completed 02-schema-fetch-tables-sequences/02-03-PLAN.md
-last_updated: "2026-03-11T07:36:02.075Z"
+stopped_at: Completed 02-schema-fetch-tables-sequences/02-04-PLAN.md
+last_updated: "2026-03-11T07:37:00Z"
 last_activity: 2026-03-11 — Roadmap created, 47 requirements mapped across 10 phases
 progress:
   total_phases: 10
   completed_phases: 1
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 6
   percent: 0
 ---
 
@@ -54,6 +54,8 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01-foundation P02 | 2 | 2 tasks | 9 files |
 | Phase 02-schema-fetch-tables-sequences P01 | 2 | 2 tasks | 7 files |
 | Phase 02-schema-fetch-tables-sequences P03 | 5 | 2 tasks | 4 files |
+| Phase 02-schema-fetch-tables-sequences P04 | 2 | 2 tasks | 4 files |
+| Phase 02-schema-fetch-tables-sequences P02 | 2 | 1 task | 2 files |
 
 ## Accumulated Context
 
@@ -74,6 +76,8 @@ Recent decisions affecting current work:
 - [Phase 02-schema-fetch-tables-sequences]: Test-first scaffolding: integration test stubs written before production fetcher code (Nyquist); TestFetchXxx stubs reference forward-declared SchemaFetcher until Wave 2
 - [Phase 02-schema-fetch-tables-sequences]: pg_sequences view over pg_sequence catalog: exposes last_value and is_called for never-advanced sequences via COALESCE
 - [Phase 02-schema-fetch-tables-sequences]: pgx v5 scans PostgreSQL text[] from array_agg directly into []string — no pgtype.Array wrapper needed for enum labels
+- [Phase 02-schema-fetch-tables-sequences]: External test packages (compositetype_test, domain_test) reference SchemaFetcher via package-qualified name requiring explicit import; composite type field grouping done in Go using ordered query output
+- [Phase 02-schema-fetch-tables-sequences]: TableSchemaFetcher uses N+1 query pattern (columns/constraints/indexes/partitioning per table) — acceptable for CLI tool; PK columns parsed from pg_get_constraintdef output rather than conkey join
 
 ### Pending Todos
 
@@ -85,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T07:36:02.073Z
-Stopped at: Completed 02-schema-fetch-tables-sequences/02-03-PLAN.md
+Last session: 2026-03-11T07:37:00Z
+Stopped at: Completed 02-schema-fetch-tables-sequences/02-04-PLAN.md
 Resume file: None
