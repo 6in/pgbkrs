@@ -43,7 +43,7 @@ type tableRow struct {
 // listTables returns all tables and partitioned tables in the schema.
 func listTables(ctx context.Context, conn *pgx.Conn, schema string) ([]tableRow, error) {
 	query := `
-SELECT c.oid, c.relname AS name, c.relkind, c.relrowsecurity AS rls_enabled
+SELECT c.oid, c.relname AS name, c.relkind::text, c.relrowsecurity AS rls_enabled
 FROM pg_class c
 JOIN pg_namespace n ON c.relnamespace = n.oid
 WHERE n.nspname = $1 AND c.relkind IN ('r', 'p')
@@ -146,7 +146,7 @@ type constraintRow struct {
 // fetchConstraints returns PK, unique, and check constraints for the given table OID.
 func fetchConstraints(ctx context.Context, conn *pgx.Conn, tableOID uint32) (core.ConstraintsDef, error) {
 	query := `
-SELECT c.conname AS name, c.contype, pg_get_constraintdef(c.oid) AS definition
+SELECT c.conname AS name, c.contype::text, pg_get_constraintdef(c.oid) AS definition
 FROM pg_constraint c
 WHERE c.conrelid = $1 AND c.contype IN ('p', 'u', 'c')
 ORDER BY c.contype, c.conname`
@@ -253,7 +253,7 @@ type partStrategyRow struct {
 // fetchPartitioning returns partitioning info for a partitioned table (relkind='p').
 func fetchPartitioning(ctx context.Context, conn *pgx.Conn, tableOID uint32) (*core.PartitionDef, error) {
 	// Step 5a: get strategy
-	stratQuery := `SELECT pt.partstrat FROM pg_partitioned_table pt WHERE pt.partrelid = $1`
+	stratQuery := `SELECT pt.partstrat::text FROM pg_partitioned_table pt WHERE pt.partrelid = $1`
 	var strat partStrategyRow
 	rows, err := conn.Query(ctx, stratQuery, tableOID)
 	if err != nil {

@@ -1,13 +1,16 @@
 BINARY := pgbackup
 CMD    := ./cmd/pgbackup
 
-.PHONY: build test lint clean
+.PHONY: build test test-integration lint clean testdb-start testdb-stop
 
 build:
 	go build -o bin/$(BINARY) $(CMD)
 
 test:
-	go test ./...
+	go test -short ./...
+
+test-integration: testdb-start
+	@eval $$(./scripts/testdb-start.sh | grep ^export) && go test ./...
 
 lint:
 	go vet ./...
@@ -15,3 +18,9 @@ lint:
 
 clean:
 	rm -rf bin/
+
+testdb-start:
+	@./scripts/testdb-start.sh
+
+testdb-stop:
+	@./scripts/testdb-stop.sh
