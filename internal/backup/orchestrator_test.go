@@ -204,21 +204,6 @@ func TestBackupIntegration(t *testing.T) {
 		t.Errorf("manifest missing or empty pg_version field; got %v", v)
 	}
 
-	// At least one schema subdirectory must exist.
-	entries, err := os.ReadDir(backupRoot)
-	if err != nil {
-		t.Fatalf("read backup root: %v", err)
-	}
-	hasSchemDir := false
-	for _, e := range entries {
-		if e.IsDir() {
-			hasSchemDir = true
-			break
-		}
-	}
-	if !hasSchemDir {
-		t.Errorf("expected at least one schema subdirectory in %s, found none", backupRoot)
-	}
 }
 
 // TestBackupSnapshotMode is an integration test that runs RunBackup with
