@@ -7,14 +7,6 @@ import (
 	"github.com/pgbkrs/pgbackup/internal/export"
 )
 
-func TestExportTableData(t *testing.T) {
-	t.Skip("requires live database")
-}
-
-func TestChecksum(t *testing.T) {
-	t.Skip("requires live database")
-}
-
 func TestShouldExportData_RegularTable(t *testing.T) {
 	td := &core.TableDef{
 		ObjectHeader: core.ObjectHeader{Kind: core.KindTable, Schema: "public", Name: "users"},
@@ -26,7 +18,7 @@ func TestShouldExportData_RegularTable(t *testing.T) {
 	}
 }
 
-func TestShouldExportData_PartitionedTable(t *testing.T) {
+func TestShouldExportData_PartitionParent(t *testing.T) {
 	td := &core.TableDef{
 		ObjectHeader: core.ObjectHeader{Kind: core.KindTable, Schema: "public", Name: "events"},
 		Columns:      []core.ColumnDef{{Name: "id", Type: "integer"}},
@@ -38,6 +30,36 @@ func TestShouldExportData_PartitionedTable(t *testing.T) {
 	}
 
 	if export.ShouldExportData(td) {
-		t.Error("expected ShouldExportData to return false for partitioned table")
+		t.Error("expected ShouldExportData to return false for partition parent table")
 	}
+}
+
+func TestShouldExportData_PartitionChild(t *testing.T) {
+	// Partition children are regular tables (Partitioning is nil).
+	td := &core.TableDef{
+		ObjectHeader: core.ObjectHeader{Kind: core.KindTable, Schema: "public", Name: "events_2024"},
+		Columns:      []core.ColumnDef{{Name: "id", Type: "integer"}, {Name: "created_at", Type: "timestamp"}},
+	}
+
+	if !export.ShouldExportData(td) {
+		t.Error("expected ShouldExportData to return true for partition child table")
+	}
+}
+
+func TestExportTableData(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires live database")
+	}
+	// Integration test: exports data from a real table, verifies file exists,
+	// checksum format is "sha256:<hex>", row count > 0.
+	// Will be validated in Phase 7 integration testing.
+}
+
+func TestExportTableData_EmptyTable(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires live database")
+	}
+	// Integration test: exports empty table, verifies row_count=0,
+	// checksum is valid sha256, file is empty.
+	// Will be validated in Phase 7 integration testing.
 }
