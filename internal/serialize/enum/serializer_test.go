@@ -35,4 +35,41 @@ func TestSerialize(t *testing.T) {
 	if m["name"] != "status" {
 		t.Errorf("name = %v, want status", m["name"])
 	}
+
+	labels, ok := m["labels"].([]interface{})
+	if !ok {
+		t.Fatalf("labels is not a list: %T", m["labels"])
+	}
+	if len(labels) != 3 {
+		t.Errorf("labels length = %d, want 3", len(labels))
+	}
+	if labels[0] != "active" || labels[1] != "inactive" || labels[2] != "deleted" {
+		t.Errorf("labels = %v, want [active inactive deleted]", labels)
+	}
+}
+
+func TestDeserialize(t *testing.T) {
+	s := &enum.Serializer{}
+	yamlData := []byte(`kind: enum
+schema: public
+name: status
+labels: [active, inactive, deleted]
+`)
+
+	obj, err := s.Deserialize(yamlData)
+	if err != nil {
+		t.Fatalf("Deserialize() error: %v", err)
+	}
+
+	ed, ok := obj.(core.EnumDef)
+	if !ok {
+		t.Fatalf("expected core.EnumDef, got %T", obj)
+	}
+
+	if len(ed.Labels) != 3 {
+		t.Fatalf("expected 3 labels, got %d", len(ed.Labels))
+	}
+	if ed.Labels[0] != "active" || ed.Labels[1] != "inactive" || ed.Labels[2] != "deleted" {
+		t.Errorf("Labels = %v, want [active inactive deleted]", ed.Labels)
+	}
 }
