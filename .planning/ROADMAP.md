@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 5: Serialization** - YAML output for all object types, CSV data export, partition handling, checksums
 - [x] **Phase 6: Dependency Resolution & Manifest** - In-memory DAG, Kahn topological sort, FK isolation, _manifest.yaml output (completed 2026-03-11)
 - [x] **Phase 7: Backup Orchestration** - End-to-end backup command: directory structure, skip detection, snapshot mode (completed 2026-03-11)
-- [ ] **Phase 8: Restore - Core Pipeline** - Pre-backup, DROP cycle, CREATE cycle, data load, sequence restoration, indexes, FK application
+- [x] **Phase 8: Restore - Core Pipeline** - Pre-backup, DROP cycle, CREATE cycle, data load, sequence restoration, indexes, FK application (completed 2026-03-11)
 - [ ] **Phase 9: Restore - Partial & Safety** - Granular restore (schema/object scope), dependency chain resolution, drop-leak detection, restore logs
 - [ ] **Phase 10: Schema Diff** - Compare two backups at schema level, detect additions/deletions/modifications, formatted output
 
@@ -195,6 +195,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 5. Serialization | 0/3 | Not started | - |
 | 6. Dependency Resolution & Manifest | 2/2 | Complete   | 2026-03-11 |
 | 7. Backup Orchestration | 2/2 | Complete   | 2026-03-11 |
-| 8. Restore - Core Pipeline | 2/3 | In Progress|  |
+| 8. Restore - Core Pipeline | 3/3 | Complete   | 2026-03-11 |
 | 9. Restore - Partial & Safety | 0/TBD | Not started | - |
 | 10. Schema Diff | 0/TBD | Not started | - |

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 08-restore-core-pipeline/08-02-PLAN.md
-last_updated: "2026-03-11T15:32:58.967Z"
+stopped_at: Completed 08-restore-core-pipeline/08-03-PLAN.md
+last_updated: "2026-03-11T15:35:27.443Z"
 last_activity: 2026-03-11 — Completed 06-02 Manifest Writer
 progress:
   total_phases: 10
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 24
-  completed_plans: 23
+  completed_plans: 24
   percent: 95
 ---
 
@@ -73,6 +73,7 @@ Progress: [██████████] 95%
 | Phase 07-backup-orchestration P02 | 3 | 2 tasks | 3 files |
 | Phase 08-restore-core-pipeline P01 | 3 | 2 tasks | 7 files |
 | Phase 08-restore-core-pipeline P02 | 8 | 2 tasks | 4 files |
+| Phase 08-restore-core-pipeline P03 | 1 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -136,6 +137,7 @@ Recent decisions affecting current work:
 - [Phase 08-restore-core-pipeline]: yamlIndex.definition uses omitempty; loader_test.go uses package restore for unexported function testing; orchestrator_test.go uses package restore_test matching backup integration pattern
 - [Phase 08-restore-core-pipeline]: FK create wave re-fetches FKs from live DB — FKs have no def.yaml in backup directory
 - [Phase 08-restore-core-pipeline]: manifest 'fk' string handled explicitly in ddlGeneratorFor; table CREATE wave executes only stmts[0]; SETVAL runs after COPY FROM
+- [Phase 08-restore-core-pipeline]: MarkFlagRequired('input') on restoreCmd makes cobra return error if --input absent; --pre-backup-dir defaults to '.' matching backup convention
 
 ### Pending Todos
 
@@ -147,6 +149,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T15:32:58.965Z
-Stopped at: Completed 08-restore-core-pipeline/08-02-PLAN.md
+Last session: 2026-03-11T15:35:27.441Z
+Stopped at: Completed 08-restore-core-pipeline/08-03-PLAN.md
 Resume file: None
