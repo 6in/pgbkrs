@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 04-ddl-generation/04-03-PLAN.md
-last_updated: "2026-03-11T11:51:54Z"
+last_updated: "2026-03-11T11:53:20.021Z"
 last_activity: 2026-03-11 — Completed 04-03 View, MatView, Function, Trigger DDL Generators
 progress:
   total_phases: 10
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 14
-  completed_plans: 13
+  completed_plans: 14
   percent: 93
 ---
 
@@ -62,6 +62,7 @@ Progress: [█████████░] 93%
 | Phase 03 P02 | 1 | 2 tasks | 2 files |
 | Phase 04-ddl-generation P01 | 4 | 2 tasks | 26 files |
 | Phase 04-ddl-generation P02 | 2 | 2 tasks | 4 files |
+| Phase 04-ddl-generation P03 | 2 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,10 @@ Recent decisions affecting current work:
 - [Phase 04-ddl-generation]: DDL generator stubs return fmt.Errorf not-implemented to make tests compilable but RED (Nyquist Wave 0)
 - [Phase 04-ddl-generation]: Items slice for comma-separated SQL body elements avoids trailing comma bugs
 - [Phase 04-ddl-generation]: PARTITION BY appended outside parentheses with uppercase strategy per PostgreSQL syntax
+- [Phase 04-ddl-generation]: Value receiver type assertions (core.ViewDef not *core.ViewDef) matching Header() receiver pattern
+- [Phase 04-ddl-generation]: Function DDL is pure passthrough of pg_get_functiondef output -- no reconstruction
+- [Phase 04-ddl-generation]: Trigger defaults to FOR EACH ROW (TriggerDef lacks row/statement granularity)
+- [Phase 04-ddl-generation]: Trigger schema applied to both table and function references (same-schema assumption)
 
 ### Pending Todos
 
@@ -106,6 +111,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T11:51:34Z
-Stopped at: Completed 04-ddl-generation/04-02-PLAN.md
+Last session: 2026-03-11T11:51:54Z
+Stopped at: Completed 04-ddl-generation/04-03-PLAN.md
 Resume file: None
