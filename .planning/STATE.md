@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-schema-fetch-views-functions-triggers-policies/03-02-PLAN.md
-last_updated: "2026-03-11T08:46:47.115Z"
-last_activity: 2026-03-11 — Completed 03-04 PolicySchemaFetcher
+stopped_at: Completed 04-ddl-generation/04-01-PLAN.md
+last_updated: "2026-03-11T11:48:03.200Z"
+last_activity: 2026-03-11 — Completed 04-01 Types, FK Fetcher, DDL Test Scaffolding
 progress:
   total_phases: 10
   completed_phases: 3
-  total_plans: 10
-  completed_plans: 10
-  percent: 70
+  total_plans: 14
+  completed_plans: 11
+  percent: 79
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-11)
 
 **Core value:** PostgreSQLのスキーマ構造とデータを人間が読めるYAML+CSV形式でオブジェクト単位にバックアップし、依存関係を自動解決して正しい順序でリストアできること
-**Current focus:** Phase 3 - Schema Fetch (Views, Functions, Triggers, Policies)
+**Current focus:** Phase 4 - DDL Generation
 
 ## Current Position
 
-Phase: 3 of 10 (Schema Fetch - Views/Functions/Triggers/Policies)
-Plan: 4 of 4 in current phase
+Phase: 4 of 10 (DDL Generation)
+Plan: 1 of 4 in current phase
 Status: Executing
-Last activity: 2026-03-11 — Completed 03-04 PolicySchemaFetcher
+Last activity: 2026-03-11 — Completed 04-01 Types, FK Fetcher, DDL Test Scaffolding
 
-Progress: [███████░░░] 70%
+Progress: [████████░░] 79%
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Progress: [███████░░░] 70%
 | Phase 03 P04 | 1 | 1 tasks | 1 files |
 | Phase 03 P03 | 2 | 2 tasks | 2 files |
 | Phase 03 P02 | 1 | 2 tasks | 2 files |
+| Phase 04-ddl-generation P01 | 4 | 2 tasks | 26 files |
 
 ## Accumulated Context
 
@@ -88,6 +89,9 @@ Recent decisions affecting current work:
 - [Phase 03]: pg_get_functiondef() for complete CREATE OR REPLACE FUNCTION DDL rather than reconstructing from pg_proc columns
 - [Phase 03]: tgtype bitmask decoded in Go with deterministic event ordering: INSERT, UPDATE, DELETE, TRUNCATE
 - [Phase 03]: Canonical fetcher pattern applied directly to pg_views and pg_matviews -- no query complexity needed for system view-based introspection
+- [Phase 04-ddl-generation]: ForeignKeyDef as independent ObjectDef with embedded ObjectHeader, not nested in TableDef
+- [Phase 04-ddl-generation]: PartitionDef.KeyExpression populated via separate pg_get_partkeydef query in fetchPartitioning
+- [Phase 04-ddl-generation]: DDL generator stubs return fmt.Errorf not-implemented to make tests compilable but RED (Nyquist Wave 0)
 
 ### Pending Todos
 
@@ -99,6 +103,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T08:43:32.733Z
-Stopped at: Completed 03-schema-fetch-views-functions-triggers-policies/03-02-PLAN.md
+Last session: 2026-03-11T11:43:39Z
+Stopped at: Completed 04-ddl-generation/04-01-PLAN.md
 Resume file: None

@@ -73,10 +73,10 @@
 
 ### DDL Generation
 
-- [ ] **DDLG-01**: テーブルCREATE DDL生成（FK制約なし = Phase1）
-- [ ] **DDLG-02**: テーブルFK制約ALTER TABLE DDL生成（Phase2）
-- [ ] **DDLG-03**: ビュー・マテビュー・関数・トリガー等のCREATE DDL生成
-- [ ] **DDLG-04**: 全オブジェクト種別のDROP DDL生成
+- [x] **DDLG-01**: テーブルCREATE DDL生成（FK制約なし = Phase1）
+- [x] **DDLG-02**: テーブルFK制約ALTER TABLE DDL生成（Phase2）
+- [x] **DDLG-03**: ビュー・マテビュー・関数・トリガー等のCREATE DDL生成
+- [x] **DDLG-04**: 全オブジェクト種別のDROP DDL生成
 
 ## v2 Requirements
 
@@ -115,10 +115,10 @@
 | FETCH-04 | Phase 3 | Complete |
 | FETCH-05 | Phase 3 | Complete |
 | FETCH-10 | Phase 3 | Complete |
-| DDLG-01 | Phase 4 | Pending |
-| DDLG-02 | Phase 4 | Pending |
-| DDLG-03 | Phase 4 | Pending |
-| DDLG-04 | Phase 4 | Pending |
+| DDLG-01 | Phase 4 | Complete |
+| DDLG-02 | Phase 4 | Complete |
+| DDLG-03 | Phase 4 | Complete |
+| DDLG-04 | Phase 4 | Complete |
 | SRLZ-01 | Phase 5 | Pending |
 | SRLZ-02 | Phase 5 | Pending |
 | SRLZ-03 | Phase 5 | Pending |
