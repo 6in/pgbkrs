@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 07-backup-orchestration/07-02-PLAN.md
-last_updated: "2026-03-11T15:04:11.246Z"
+stopped_at: Completed 08-restore-core-pipeline/08-01-PLAN.md
+last_updated: "2026-03-11T15:26:58.061Z"
 last_activity: 2026-03-11 — Completed 06-02 Manifest Writer
 progress:
   total_phases: 10
   completed_phases: 7
-  total_plans: 21
-  completed_plans: 21
+  total_plans: 24
+  completed_plans: 22
   percent: 95
 ---
 
@@ -71,6 +71,7 @@ Progress: [██████████] 95%
 | Phase 06 P02 | 3 | 2 tasks | 3 files |
 | Phase 07-backup-orchestration P01 | 3 | 2 tasks | 5 files |
 | Phase 07-backup-orchestration P02 | 3 | 2 tasks | 3 files |
+| Phase 08-restore-core-pipeline P01 | 3 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -130,6 +131,8 @@ Recent decisions affecting current work:
 - [Phase 07-backup-orchestration]: skipReason() uses strings.Contains to detect array variants (bytea[] matches bytea check); pointer receiver required for fetchTable.SchemaFetcher
 - [Phase 07-backup-orchestration]: queryConn threads tx.Conn() or conn through all fetches/COPY TO — single change point for snapshot mode without altering function signatures
 - [Phase 07-backup-orchestration]: Integration tests skip on absent TEST_DATABASE_URL rather than fail — supports CI without live DB requirement
+- [Phase 08-restore-core-pipeline]: ReadManifest added alongside WriteManifest in manifest.go as symmetric read counterpart
+- [Phase 08-restore-core-pipeline]: yamlIndex.definition uses omitempty; loader_test.go uses package restore for unexported function testing; orchestrator_test.go uses package restore_test matching backup integration pattern
 
 ### Pending Todos
 
@@ -141,6 +144,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T15:01:29.531Z
-Stopped at: Completed 07-backup-orchestration/07-02-PLAN.md
+Last session: 2026-03-11T15:26:58.059Z
+Stopped at: Completed 08-restore-core-pipeline/08-01-PLAN.md
 Resume file: None

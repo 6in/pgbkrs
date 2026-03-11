@@ -49,15 +49,15 @@
 
 ### Restore
 
-- [ ] **REST-01**: リストア前の自動バックアップ実行
-- [ ] **REST-02**: restore_order逆順でのDROP実行とdrop.log記録
+- [x] **REST-01**: リストア前の自動バックアップ実行
+- [x] **REST-02**: restore_order逆順でのDROP実行とdrop.log記録
 - [ ] **REST-03**: DROP漏れ検知（DROP前後のオブジェクト一覧比較、残存オブジェクト警告）
-- [ ] **REST-04**: restore_order順でのCREATE実行
-- [ ] **REST-05**: COPY FROMによるデータ投入（通常テーブル + パーティション子テーブル）
-- [ ] **REST-06**: シーケンス値のSETVAL復元
-- [ ] **REST-07**: インデックス作成
-- [ ] **REST-08**: FK制約の一括適用（全テーブル作成・データ投入後）
-- [ ] **REST-09**: ビュー・関数・トリガー・ポリシーの作成
+- [x] **REST-04**: restore_order順でのCREATE実行
+- [x] **REST-05**: COPY FROMによるデータ投入（通常テーブル + パーティション子テーブル）
+- [x] **REST-06**: シーケンス値のSETVAL復元
+- [x] **REST-07**: インデックス作成
+- [x] **REST-08**: FK制約の一括適用（全テーブル作成・データ投入後）
+- [x] **REST-09**: ビュー・関数・トリガー・ポリシーの作成
 - [ ] **REST-10**: リストア粒度対応（DB全体 / スキーマ指定 / オブジェクト指定）
 - [ ] **REST-11**: 部分リストア時の依存チェーン自動解決（depends_on再帰走査）
 - [ ] **REST-12**: 依存先オブジェクト未存在時のエラー停止
@@ -132,14 +132,14 @@
 | BKUP-02 | Phase 7 | Complete |
 | BKUP-03 | Phase 7 | Complete |
 | BKUP-04 | Phase 7 | Complete |
-| REST-01 | Phase 8 | Pending |
-| REST-02 | Phase 8 | Pending |
-| REST-04 | Phase 8 | Pending |
-| REST-05 | Phase 8 | Pending |
-| REST-06 | Phase 8 | Pending |
-| REST-07 | Phase 8 | Pending |
-| REST-08 | Phase 8 | Pending |
-| REST-09 | Phase 8 | Pending |
+| REST-01 | Phase 8 | Complete |
+| REST-02 | Phase 8 | Complete |
+| REST-04 | Phase 8 | Complete |
+| REST-05 | Phase 8 | Complete |
+| REST-06 | Phase 8 | Complete |
+| REST-07 | Phase 8 | Complete |
+| REST-08 | Phase 8 | Complete |
+| REST-09 | Phase 8 | Complete |
 | REST-03 | Phase 9 | Pending |
 | REST-10 | Phase 9 | Pending |
 | REST-11 | Phase 9 | Pending |
