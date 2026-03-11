@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Completed 02-schema-fetch-tables-sequences/02-04-PLAN.md
-last_updated: "2026-03-11T07:41:49.581Z"
+status: executing
+stopped_at: Completed 03-schema-fetch-views-functions-triggers-policies/03-01-PLAN.md
+last_updated: "2026-03-11T08:39:34.426Z"
 last_activity: 2026-03-11 — Roadmap created, 47 requirements mapped across 10 phases
 progress:
   total_phases: 10
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 10
+  completed_plans: 7
   percent: 0
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-11)
 
 **Core value:** PostgreSQLのスキーマ構造とデータを人間が読めるYAML+CSV形式でオブジェクト単位にバックアップし、依存関係を自動解決して正しい順序でリストアできること
-**Current focus:** Phase 1 - Foundation
+**Current focus:** Phase 3 - Schema Fetch (Views, Functions, Triggers, Policies)
 
 ## Current Position
 
-Phase: 1 of 10 (Foundation)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-03-11 — Roadmap created, 47 requirements mapped across 10 phases
+Phase: 3 of 10 (Schema Fetch - Views/Functions/Triggers/Policies)
+Plan: 1 of 4 in current phase
+Status: Executing
+Last activity: 2026-03-11 — Completed 03-01 types expansion + test stubs
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [███████░░░] 70%
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 02-schema-fetch-tables-sequences P03 | 5 | 2 tasks | 4 files |
 | Phase 02-schema-fetch-tables-sequences P04 | 2 | 2 tasks | 4 files |
 | Phase 02-schema-fetch-tables-sequences P02 | 2 | 1 task | 2 files |
+| Phase 03-schema-fetch-views-functions-triggers-policies P01 | 3 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -78,6 +79,8 @@ Recent decisions affecting current work:
 - [Phase 02-schema-fetch-tables-sequences]: pgx v5 scans PostgreSQL text[] from array_agg directly into []string — no pgtype.Array wrapper needed for enum labels
 - [Phase 02-schema-fetch-tables-sequences]: External test packages (compositetype_test, domain_test) reference SchemaFetcher via package-qualified name requiring explicit import; composite type field grouping done in Go using ordered query output
 - [Phase 02-schema-fetch-tables-sequences]: TableSchemaFetcher uses N+1 query pattern (columns/constraints/indexes/partitioning per table) — acceptable for CLI tool; PK columns parsed from pg_get_constraintdef output rather than conkey join
+- [Phase 03-schema-fetch-views-functions-triggers-policies]: Phase 3 DDL added as separate fmt.Sprintf block (ddl2) with %[1]s positional args to avoid numbering conflicts with existing Phase 2 DDL
+- [Phase 03-schema-fetch-views-functions-triggers-policies]: TDD RED/GREEN for struct expansion: types_phase3_test.go verifies all new fields compile and are accessible
 
 ### Pending Todos
 
@@ -89,6 +92,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T07:37:00Z
-Stopped at: Completed 02-schema-fetch-tables-sequences/02-04-PLAN.md
+Last session: 2026-03-11T08:39:00Z
+Stopped at: Completed 03-schema-fetch-views-functions-triggers-policies/03-01-PLAN.md
 Resume file: None

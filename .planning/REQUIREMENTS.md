@@ -15,15 +15,15 @@
 ### Backup - Schema Fetch
 
 - [x] **FETCH-01**: テーブル定義のpg_catalog取得（カラム、制約、インデックス、権限、RLS、パーティション定義）
-- [ ] **FETCH-02**: ビュー定義のpg_catalog取得
-- [ ] **FETCH-03**: マテリアライズドビュー定義のpg_catalog取得
-- [ ] **FETCH-04**: 関数定義のpg_catalog取得（pg_get_functiondef）
-- [ ] **FETCH-05**: トリガー定義のpg_catalog取得
+- [x] **FETCH-02**: ビュー定義のpg_catalog取得
+- [x] **FETCH-03**: マテリアライズドビュー定義のpg_catalog取得
+- [x] **FETCH-04**: 関数定義のpg_catalog取得（pg_get_functiondef）
+- [x] **FETCH-05**: トリガー定義のpg_catalog取得
 - [x] **FETCH-06**: シーケンス定義・現在値のpg_catalog取得
 - [x] **FETCH-07**: 複合型定義のpg_catalog取得
 - [x] **FETCH-08**: ドメイン定義のpg_catalog取得
 - [x] **FETCH-09**: ENUM定義のpg_catalog取得
-- [ ] **FETCH-10**: RLSポリシー定義のpg_catalog取得
+- [x] **FETCH-10**: RLSポリシー定義のpg_catalog取得
 
 ### Backup - Serialization
 
@@ -110,11 +110,11 @@
 | FETCH-07 | Phase 2 | Complete |
 | FETCH-08 | Phase 2 | Complete |
 | FETCH-09 | Phase 2 | Complete |
-| FETCH-02 | Phase 3 | Pending |
-| FETCH-03 | Phase 3 | Pending |
-| FETCH-04 | Phase 3 | Pending |
-| FETCH-05 | Phase 3 | Pending |
-| FETCH-10 | Phase 3 | Pending |
+| FETCH-02 | Phase 3 | Complete |
+| FETCH-03 | Phase 3 | Complete |
+| FETCH-04 | Phase 3 | Complete |
+| FETCH-05 | Phase 3 | Complete |
+| FETCH-10 | Phase 3 | Complete |
 | DDLG-01 | Phase 4 | Pending |
 | DDLG-02 | Phase 4 | Pending |
 | DDLG-03 | Phase 4 | Pending |
