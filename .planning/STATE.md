@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-ddl-generation/04-03-PLAN.md
-last_updated: "2026-03-11T11:53:20.021Z"
-last_activity: 2026-03-11 — Completed 04-03 View, MatView, Function, Trigger DDL Generators
+stopped_at: Completed 04-ddl-generation/04-04-PLAN.md
+last_updated: "2026-03-11T11:52:36Z"
+last_activity: 2026-03-11 — Completed 04-04 Sequence, CompositeType, Domain, Enum, Policy DDL Generators
 progress:
   total_phases: 10
   completed_phases: 4
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-11)
 ## Current Position
 
 Phase: 4 of 10 (DDL Generation)
-Plan: 3 of 4 in current phase
+Plan: 4 of 4 in current phase (PHASE COMPLETE)
 Status: Executing
-Last activity: 2026-03-11 — Completed 04-03 View, MatView, Function, Trigger DDL Generators
+Last activity: 2026-03-11 — Completed 04-04 Sequence, CompositeType, Domain, Enum, Policy DDL Generators
 
-Progress: [█████████░] 93%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -63,6 +63,7 @@ Progress: [█████████░] 93%
 | Phase 04-ddl-generation P01 | 4 | 2 tasks | 26 files |
 | Phase 04-ddl-generation P02 | 2 | 2 tasks | 4 files |
 | Phase 04-ddl-generation P03 | 2 | 2 tasks | 8 files |
+| Phase 04-ddl-generation P04 | 3 | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,9 @@ Recent decisions affecting current work:
 - [Phase 04-ddl-generation]: Function DDL is pure passthrough of pg_get_functiondef output -- no reconstruction
 - [Phase 04-ddl-generation]: Trigger defaults to FOR EACH ROW (TriggerDef lacks row/statement granularity)
 - [Phase 04-ddl-generation]: Trigger schema applied to both table and function references (same-schema assumption)
+- [Phase 04-ddl-generation]: Value receiver type assertions for all 5 remaining generators (SequenceDef, TypeDef, DomainDef, EnumDef, PolicyDef)
+- [Phase 04-ddl-generation]: Policy DROP omits CASCADE per PostgreSQL semantics (policies do not cascade)
+- [Phase 04-ddl-generation]: Domain CheckDefinition passed through verbatim from pg_get_constraintdef (already contains CHECK (...))
 
 ### Pending Todos
 
@@ -111,6 +115,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T11:51:54Z
-Stopped at: Completed 04-ddl-generation/04-03-PLAN.md
+Last session: 2026-03-11T11:52:36Z
+Stopped at: Completed 04-ddl-generation/04-04-PLAN.md
 Resume file: None
