@@ -35,8 +35,8 @@
 
 ### Backup - Orchestration
 
-- [ ] **BKUP-01**: スキーマ単位のディレクトリ構造生成（仕様書セクション4準拠）
-- [ ] **BKUP-02**: スキップ対象テーブル検出（bytea, xml, pg_lsn, txid_snapshot列）と警告ログ
+- [x] **BKUP-01**: スキーマ単位のディレクトリ構造生成（仕様書セクション4準拠）
+- [x] **BKUP-02**: スキップ対象テーブル検出（bytea, xml, pg_lsn, txid_snapshot列）と警告ログ
 - [ ] **BKUP-03**: --snapshotオプションによるトランザクション一貫性モード
 - [ ] **BKUP-04**: スナップショットなしモード（デフォルト、各オブジェクト個別取得）
 
@@ -128,8 +128,8 @@
 | DEPS-02 | Phase 6 | Complete |
 | DEPS-03 | Phase 6 | Complete |
 | DEPS-04 | Phase 6 | Complete |
-| BKUP-01 | Phase 7 | Pending |
-| BKUP-02 | Phase 7 | Pending |
+| BKUP-01 | Phase 7 | Complete |
+| BKUP-02 | Phase 7 | Complete |
 | BKUP-03 | Phase 7 | Pending |
 | BKUP-04 | Phase 7 | Pending |
 | REST-01 | Phase 8 | Pending |
