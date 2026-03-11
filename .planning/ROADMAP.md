@@ -34,7 +34,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Running `pgbackup restore` and `pgbackup diff` are recognized as valid subcommands (no "unknown command" error)
   3. A new object type can be registered in CommandRegistry with one `Register()` call and is immediately resolvable
   4. `SchemaFetcher`, `Serializer`, and `DDLGenerator` interfaces exist and the build passes
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Go module init + internal/core interfaces, types, registry, and unit tests
+- [ ] 01-02-PLAN.md — internal/db connection helper, cobra CLI scaffold (backup/restore/diff), Makefile
 
 ### Phase 2: Schema Fetch - Tables & Sequences
 **Goal**: The tool can query pg_catalog and return complete in-memory definitions for tables (including columns, constraints, indexes, RLS, partitioning), sequences (including current value), composite types, domains, and ENUMs
@@ -148,7 +152,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | - |
+| 1. Foundation | 0/2 | Not started | - |
 | 2. Schema Fetch - Tables & Sequences | 0/TBD | Not started | - |
 | 3. Schema Fetch - Views, Functions, Triggers & Policies | 0/TBD | Not started | - |
 | 4. DDL Generation | 0/TBD | Not started | - |
