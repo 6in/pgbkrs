@@ -67,7 +67,13 @@ Plans:
   3. Fetching a function returns the body via `pg_get_functiondef` and its argument/return types
   4. Fetching a trigger returns the event, timing, function reference, and target table
   5. Fetching RLS policies for a table returns each policy's name, command, roles, and USING/WITH CHECK expressions
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Expand *Def structs in types.go + extend testhelpers/setup.go + all 5 integration test stubs (Wave 1)
+- [ ] 03-02-PLAN.md — internal/fetch/view + internal/fetch/matview: ViewSchemaFetcher and MatViewSchemaFetcher (Wave 2, parallel)
+- [ ] 03-03-PLAN.md — internal/fetch/function + internal/fetch/trigger: FunctionSchemaFetcher and TriggerSchemaFetcher (Wave 2, parallel)
+- [ ] 03-04-PLAN.md — internal/fetch/policy: PolicySchemaFetcher with polroles unnest and PUBLIC sentinel handling (Wave 2, parallel)
 
 ### Phase 4: DDL Generation
 **Goal**: Given an in-memory object definition, the tool can produce correct CREATE DDL (excluding FK constraints for tables), separate FK ALTER TABLE DDL, and DROP DDL for every supported object type
@@ -160,7 +166,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete   | 2026-03-11 |
 | 2. Schema Fetch - Tables & Sequences | 4/4 | Complete   | 2026-03-11 |
-| 3. Schema Fetch - Views, Functions, Triggers & Policies | 0/TBD | Not started | - |
+| 3. Schema Fetch - Views, Functions, Triggers & Policies | 0/4 | Not started | - |
 | 4. DDL Generation | 0/TBD | Not started | - |
 | 5. Serialization | 0/TBD | Not started | - |
 | 6. Dependency Resolution & Manifest | 0/TBD | Not started | - |
