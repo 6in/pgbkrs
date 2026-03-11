@@ -87,6 +87,15 @@ type CompositeField struct {
 	Type string // format_type() output
 }
 
+// TableDataMeta holds CSV export metadata written into the def.yaml data: block.
+// Defined here in core to avoid import cycles (export imports core, not vice versa).
+type TableDataMeta struct {
+	File     string
+	Columns  []string
+	RowCount int64
+	Checksum string
+}
+
 // TableDef represents a table schema object.
 type TableDef struct {
 	ObjectHeader
@@ -95,6 +104,9 @@ type TableDef struct {
 	Indexes      []IndexDef
 	Partitioning *PartitionDef // nil for non-partitioned tables
 	RLS          RLSDef
+	// DataMeta is populated by the backup orchestrator after CSV export.
+	// When non-nil, the table serializer emits a data: block in def.yaml.
+	DataMeta *TableDataMeta
 }
 
 func (d TableDef) Header() ObjectHeader { return d.ObjectHeader }

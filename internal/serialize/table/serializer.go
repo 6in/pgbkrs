@@ -135,6 +135,16 @@ func toYAML(td *core.TableDef) yamlTableDef {
 		}
 	}
 
+	// DataMeta: emit data: block in def.yaml when CSV export metadata is available.
+	if td.DataMeta != nil {
+		yd.Data = &yamlData{
+			File:     td.DataMeta.File,
+			Columns:  td.DataMeta.Columns,
+			RowCount: td.DataMeta.RowCount,
+			Checksum: td.DataMeta.Checksum,
+		}
+	}
+
 	return yd
 }
 
