@@ -28,7 +28,7 @@
 ### Backup - Serialization
 
 - [x] **SRLZ-01**: テーブルdef.yamlの出力（仕様書5.2準拠）
-- [ ] **SRLZ-02**: ビュー・マテビュー・関数・トリガー等のYAML出力
+- [x] **SRLZ-02**: ビュー・マテビュー・関数・トリガー等のYAML出力
 - [ ] **SRLZ-03**: テーブルデータのCOPY TO CSV出力
 - [ ] **SRLZ-04**: パーティションテーブルの親子構造出力（親はデータなし、子テーブル単位でCSV）
 - [ ] **SRLZ-05**: data.csvのsha256チェックサム計算と行数記録
@@ -120,7 +120,7 @@
 | DDLG-03 | Phase 4 | Complete |
 | DDLG-04 | Phase 4 | Complete |
 | SRLZ-01 | Phase 5 | Complete |
-| SRLZ-02 | Phase 5 | Pending |
+| SRLZ-02 | Phase 5 | Complete |
 | SRLZ-03 | Phase 5 | Pending |
 | SRLZ-04 | Phase 5 | Pending |
 | SRLZ-05 | Phase 5 | Pending |
