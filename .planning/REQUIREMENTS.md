@@ -101,13 +101,61 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (Roadmap作成後に更新) | | |
+| FOUND-01 | Phase 1 | Pending |
+| FOUND-02 | Phase 1 | Pending |
+| FOUND-03 | Phase 1 | Pending |
+| FOUND-04 | Phase 1 | Pending |
+| FETCH-01 | Phase 2 | Pending |
+| FETCH-06 | Phase 2 | Pending |
+| FETCH-07 | Phase 2 | Pending |
+| FETCH-08 | Phase 2 | Pending |
+| FETCH-09 | Phase 2 | Pending |
+| FETCH-02 | Phase 3 | Pending |
+| FETCH-03 | Phase 3 | Pending |
+| FETCH-04 | Phase 3 | Pending |
+| FETCH-05 | Phase 3 | Pending |
+| FETCH-10 | Phase 3 | Pending |
+| DDLG-01 | Phase 4 | Pending |
+| DDLG-02 | Phase 4 | Pending |
+| DDLG-03 | Phase 4 | Pending |
+| DDLG-04 | Phase 4 | Pending |
+| SRLZ-01 | Phase 5 | Pending |
+| SRLZ-02 | Phase 5 | Pending |
+| SRLZ-03 | Phase 5 | Pending |
+| SRLZ-04 | Phase 5 | Pending |
+| SRLZ-05 | Phase 5 | Pending |
+| DEPS-01 | Phase 6 | Pending |
+| DEPS-02 | Phase 6 | Pending |
+| DEPS-03 | Phase 6 | Pending |
+| DEPS-04 | Phase 6 | Pending |
+| BKUP-01 | Phase 7 | Pending |
+| BKUP-02 | Phase 7 | Pending |
+| BKUP-03 | Phase 7 | Pending |
+| BKUP-04 | Phase 7 | Pending |
+| REST-01 | Phase 8 | Pending |
+| REST-02 | Phase 8 | Pending |
+| REST-04 | Phase 8 | Pending |
+| REST-05 | Phase 8 | Pending |
+| REST-06 | Phase 8 | Pending |
+| REST-07 | Phase 8 | Pending |
+| REST-08 | Phase 8 | Pending |
+| REST-09 | Phase 8 | Pending |
+| REST-03 | Phase 9 | Pending |
+| REST-10 | Phase 9 | Pending |
+| REST-11 | Phase 9 | Pending |
+| REST-12 | Phase 9 | Pending |
+| REST-13 | Phase 9 | Pending |
+| DIFF-01 | Phase 10 | Pending |
+| DIFF-02 | Phase 10 | Pending |
+| DIFF-03 | Phase 10 | Pending |
+| DIFF-04 | Phase 10 | Pending |
+| DIFF-05 | Phase 10 | Pending |
 
 **Coverage:**
 - v1 requirements: 47 total
-- Mapped to phases: 0
-- Unmapped: 47 ⚠️
+- Mapped to phases: 47
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-11*
-*Last updated: 2026-03-11 after initial definition*
+*Last updated: 2026-03-11 after roadmap creation*
