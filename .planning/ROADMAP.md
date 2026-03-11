@@ -49,7 +49,13 @@ Plans:
   2. Fetching a partitioned table returns partition strategy and lists child tables
   3. Fetching a sequence returns its definition and current value (last_value)
   4. Fetching a composite type, domain, and ENUM each return their full pg_catalog-sourced definition
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Expand *Def structs in internal/core/types.go + all integration test scaffolds (Wave 1)
+- [ ] 02-02-PLAN.md — internal/fetch/table: TableSchemaFetcher with columns, constraints, indexes, partitioning, RLS (Wave 2)
+- [ ] 02-03-PLAN.md — internal/fetch/sequence + internal/fetch/enum: SequenceSchemaFetcher and EnumSchemaFetcher (Wave 2, parallel)
+- [ ] 02-04-PLAN.md — internal/fetch/compositetype + internal/fetch/domain: CompositeTypeSchemaFetcher and DomainSchemaFetcher (Wave 2, parallel)
 
 ### Phase 3: Schema Fetch - Views, Functions, Triggers & Policies
 **Goal**: The tool can retrieve complete in-memory definitions for views, materialized views, functions (via pg_get_functiondef), triggers, and RLS policies from pg_catalog
@@ -153,7 +159,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete   | 2026-03-11 |
-| 2. Schema Fetch - Tables & Sequences | 0/TBD | Not started | - |
+| 2. Schema Fetch - Tables & Sequences | 0/4 | Not started | - |
 | 3. Schema Fetch - Views, Functions, Triggers & Policies | 0/TBD | Not started | - |
 | 4. DDL Generation | 0/TBD | Not started | - |
 | 5. Serialization | 0/TBD | Not started | - |
