@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-ddl-generation/04-01-PLAN.md
-last_updated: "2026-03-11T11:48:03.200Z"
-last_activity: 2026-03-11 — Completed 04-01 Types, FK Fetcher, DDL Test Scaffolding
+stopped_at: Completed 04-ddl-generation/04-03-PLAN.md
+last_updated: "2026-03-11T11:51:54Z"
+last_activity: 2026-03-11 — Completed 04-03 View, MatView, Function, Trigger DDL Generators
 progress:
   total_phases: 10
   completed_phases: 3
   total_plans: 14
-  completed_plans: 11
-  percent: 79
+  completed_plans: 13
+  percent: 93
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-11)
 ## Current Position
 
 Phase: 4 of 10 (DDL Generation)
-Plan: 1 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: Executing
-Last activity: 2026-03-11 — Completed 04-01 Types, FK Fetcher, DDL Test Scaffolding
+Last activity: 2026-03-11 — Completed 04-03 View, MatView, Function, Trigger DDL Generators
 
-Progress: [████████░░] 79%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Progress: [████████░░] 79%
 | Phase 03 P03 | 2 | 2 tasks | 2 files |
 | Phase 03 P02 | 1 | 2 tasks | 2 files |
 | Phase 04-ddl-generation P01 | 4 | 2 tasks | 26 files |
+| Phase 04-ddl-generation P02 | 2 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,8 @@ Recent decisions affecting current work:
 - [Phase 04-ddl-generation]: ForeignKeyDef as independent ObjectDef with embedded ObjectHeader, not nested in TableDef
 - [Phase 04-ddl-generation]: PartitionDef.KeyExpression populated via separate pg_get_partkeydef query in fetchPartitioning
 - [Phase 04-ddl-generation]: DDL generator stubs return fmt.Errorf not-implemented to make tests compilable but RED (Nyquist Wave 0)
+- [Phase 04-ddl-generation]: Items slice for comma-separated SQL body elements avoids trailing comma bugs
+- [Phase 04-ddl-generation]: PARTITION BY appended outside parentheses with uppercase strategy per PostgreSQL syntax
 
 ### Pending Todos
 
@@ -103,6 +106,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T11:43:39Z
-Stopped at: Completed 04-ddl-generation/04-01-PLAN.md
+Last session: 2026-03-11T11:51:34Z
+Stopped at: Completed 04-ddl-generation/04-02-PLAN.md
 Resume file: None

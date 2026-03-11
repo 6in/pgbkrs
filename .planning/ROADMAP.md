@@ -173,7 +173,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 1. Foundation | 2/2 | Complete   | 2026-03-11 |
 | 2. Schema Fetch - Tables & Sequences | 4/4 | Complete   | 2026-03-11 |
 | 3. Schema Fetch - Views, Functions, Triggers & Policies | 4/4 | Complete   | 2026-03-11 |
-| 4. DDL Generation | 1/4 | In Progress|  |
+| 4. DDL Generation | 3/4 | In Progress|  |
 | 5. Serialization | 0/TBD | Not started | - |
 | 6. Dependency Resolution & Manifest | 0/TBD | Not started | - |
 | 7. Backup Orchestration | 0/TBD | Not started | - |
