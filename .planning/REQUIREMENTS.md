@@ -9,8 +9,8 @@
 
 - [ ] **FOUND-01**: Goプロジェクト構成（cmd/internal構造）とサブコマンドCLI（backup/restore/diff）のセットアップ
 - [ ] **FOUND-02**: PostgreSQL接続（--host, --port, --user, --password, --dbname フラグ）
-- [ ] **FOUND-03**: コマンドパターン基盤（ObjectDef, SchemaFetcher, Serializer, DDLGenerator インターフェース）
-- [ ] **FOUND-04**: CommandRegistryによるオブジェクト種別→コマンド解決
+- [x] **FOUND-03**: コマンドパターン基盤（ObjectDef, SchemaFetcher, Serializer, DDLGenerator インターフェース）
+- [x] **FOUND-04**: CommandRegistryによるオブジェクト種別→コマンド解決
 
 ### Backup - Schema Fetch
 
@@ -103,8 +103,8 @@
 |-------------|-------|--------|
 | FOUND-01 | Phase 1 | Pending |
 | FOUND-02 | Phase 1 | Pending |
-| FOUND-03 | Phase 1 | Pending |
-| FOUND-04 | Phase 1 | Pending |
+| FOUND-03 | Phase 1 | Complete |
+| FOUND-04 | Phase 1 | Complete |
 | FETCH-01 | Phase 2 | Pending |
 | FETCH-06 | Phase 2 | Pending |
 | FETCH-07 | Phase 2 | Pending |
