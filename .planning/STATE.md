@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-03-11)
 ## Current Position
 
 Phase: 3 of 10 (Schema Fetch - Views/Functions/Triggers/Policies)
-Plan: 1 of 4 in current phase
+Plan: 4 of 4 in current phase
 Status: Executing
-Last activity: 2026-03-11 — Completed 03-01 types expansion + test stubs
+Last activity: 2026-03-11 — Completed 03-04 PolicySchemaFetcher
 
 Progress: [███████░░░] 70%
 
