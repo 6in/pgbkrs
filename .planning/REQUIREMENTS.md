@@ -42,9 +42,9 @@
 
 ### Dependency Resolution
 
-- [ ] **DEPS-01**: インメモリDAG構築（オブジェクト間の依存関係）
-- [ ] **DEPS-02**: Kahn法トポロジカルソートによるリストア順序計算
-- [ ] **DEPS-03**: FK制約の独立オブジェクト化（循環FK回避）
+- [x] **DEPS-01**: インメモリDAG構築（オブジェクト間の依存関係）
+- [x] **DEPS-02**: Kahn法トポロジカルソートによるリストア順序計算
+- [x] **DEPS-03**: FK制約の独立オブジェクト化（循環FK回避）
 - [ ] **DEPS-04**: _manifest.yaml生成（依存関係、リストア順序、メタ情報、スキップ情報）
 
 ### Restore
@@ -124,9 +124,9 @@
 | SRLZ-03 | Phase 5 | Complete |
 | SRLZ-04 | Phase 5 | Complete |
 | SRLZ-05 | Phase 5 | Complete |
-| DEPS-01 | Phase 6 | Pending |
-| DEPS-02 | Phase 6 | Pending |
-| DEPS-03 | Phase 6 | Pending |
+| DEPS-01 | Phase 6 | Complete |
+| DEPS-02 | Phase 6 | Complete |
+| DEPS-03 | Phase 6 | Complete |
 | DEPS-04 | Phase 6 | Pending |
 | BKUP-01 | Phase 7 | Pending |
 | BKUP-02 | Phase 7 | Pending |

@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 05-serialization/05-03-PLAN.md
-last_updated: "2026-03-11T13:42:21.785Z"
+last_updated: "2026-03-11T14:25:00.237Z"
 last_activity: 2026-03-11 — Completed 05-02 Non-Table Object Serializers
 progress:
   total_phases: 10
   completed_phases: 5
-  total_plans: 17
-  completed_plans: 17
+  total_plans: 19
+  completed_plans: 18
   percent: 94
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-11)
 
 **Core value:** PostgreSQLのスキーマ構造とデータを人間が読めるYAML+CSV形式でオブジェクト単位にバックアップし、依存関係を自動解決して正しい順序でリストアできること
-**Current focus:** Phase 5 - Serialization
+**Current focus:** Phase 6 - Dependency Resolution & Manifest
 
 ## Current Position
 
-Phase: 5 of 10 (Serialization)
-Plan: 2 of 3 in current phase
+Phase: 6 of 10 (Dependency Resolution & Manifest)
+Plan: 1 of 2 in current phase
 Status: Executing
-Last activity: 2026-03-11 — Completed 05-02 Non-Table Object Serializers
+Last activity: 2026-03-11 — Completed 06-01 DAG Builder and Topological Sort
 
-Progress: [█████████░] 94%
+Progress: [██████████] 95%
 
 ## Performance Metrics
 
@@ -67,6 +67,7 @@ Progress: [█████████░] 94%
 | Phase 05 P01 | 3 | 2 tasks | 25 files |
 | Phase 05 P02 | 5 | 2 tasks | 20 files |
 | Phase 05-serialization P03 | 2 | 2 tasks | 2 files |
+| Phase 06-dependency-resolution-manifest P01 | 3 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -115,6 +116,10 @@ Recent decisions affecting current work:
 - [Phase 05]: No omitempty on boolean fields where false is meaningful (nullable, is_populated, cycle, is_called)
 - [Phase 05-serialization]: Quoted schema/table identifiers in COPY command for mixed-case safety
 - [Phase 05-serialization]: Single-pass streaming checksum via io.MultiWriter(file, hash) for data export
+- [Phase 06-dependency-resolution-manifest]: Two-pass DAG: AddObject registers nodes/customTypes, Resolve builds edges -- avoids ordering issues
+- [Phase 06-dependency-resolution-manifest]: Kind-priority tiebreaking in Kahn's sort instead of explicit view->table edges -- simpler and more robust
+- [Phase 06-dependency-resolution-manifest]: inDegree tracks dependency count per node (zero = ready to restore first)
+- [Phase 06-dependency-resolution-manifest]: FKs sorted alphabetically by schema.name when appended for deterministic output
 
 ### Pending Todos
 
@@ -126,6 +131,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T13:39:30.701Z
-Stopped at: Completed 05-serialization/05-03-PLAN.md
+Last session: 2026-03-11T14:24:30Z
+Stopped at: Completed 06-dependency-resolution-manifest/06-01-PLAN.md
 Resume file: None
