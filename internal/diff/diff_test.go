@@ -24,7 +24,7 @@ func TestLoadBackup(t *testing.T) {
 		dir := t.TempDir()
 		// Create a minimal manifest so loadBackup can parse it.
 		manifestContent := "RestoreOrder: []\n"
-		if err := os.WriteFile(filepath.Join(dir, "manifest.yaml"), []byte(manifestContent), 0o644); err != nil {
+		if err := os.WriteFile(filepath.Join(dir, "_manifest.yaml"), []byte(manifestContent), 0o644); err != nil {
 			t.Fatalf("failed to write manifest: %v", err)
 		}
 		result, err := loadBackup(dir)
