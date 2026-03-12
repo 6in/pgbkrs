@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 10-schema-diff/10-01-PLAN.md
-last_updated: "2026-03-12T08:22:58.592Z"
+stopped_at: Completed 10-schema-diff/10-02-PLAN.md
+last_updated: "2026-03-12T08:29:41.559Z"
 last_activity: 2026-03-11 — Completed 06-02 Manifest Writer
 progress:
   total_phases: 10
   completed_phases: 9
   total_plans: 30
-  completed_plans: 28
+  completed_plans: 29
   percent: 95
 ---
 
@@ -78,6 +78,7 @@ Progress: [██████████] 95%
 | Phase 09-restore-partial-safety P02 | 20 | 2 tasks | 3 files |
 | Phase 09-restore-partial-safety P03 | 5 | 1 tasks | 1 files |
 | Phase 10-schema-diff P01 | 2 | 1 tasks | 5 files |
+| Phase 10-schema-diff P02 | 2 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -149,6 +150,9 @@ Recent decisions affecting current work:
 - [Phase 09-restore-partial-safety]: TestMissingDependencyError constructs minimal resolve.Manifest directly for pure unit test of REST-12 without DB dependency
 - [Phase 09-restore-partial-safety]: Flag registration placed in init() after existing flags; MarkFlagRequired kept at end; placeholder comment removed
 - [Phase 10-schema-diff]: White-box test package (package diff) for access to unexported functions; test keys use schema.kind.name format; DiffResult.Changed carries []string Details for human-readable per-object change lines
+- [Phase 10-schema-diff]: diffNonTable uses yaml.Marshal byte comparison over serializer dispatch — simpler, avoids runtime serializer lookup by ObjectDef type
+- [Phase 10-schema-diff]: Trigger/policy post-processing pass in compareObjects moves attached objects into table Changed.Details when table exists in both backups
+- [Phase 10-schema-diff]: Auto-fix: diff_test.go manifest filename corrected from manifest.yaml to _manifest.yaml per system-wide convention
 
 ### Pending Todos
 
@@ -160,6 +164,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-12T08:22:58.589Z
-Stopped at: Completed 10-schema-diff/10-01-PLAN.md
+Last session: 2026-03-12T08:29:41.556Z
+Stopped at: Completed 10-schema-diff/10-02-PLAN.md
 Resume file: None

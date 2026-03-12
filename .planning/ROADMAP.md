@@ -207,4 +207,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Backup Orchestration | 2/2 | Complete   | 2026-03-11 |
 | 8. Restore - Core Pipeline | 3/3 | Complete   | 2026-03-11 |
 | 9. Restore - Partial & Safety | 3/3 | Complete   | 2026-03-11 |
-| 10. Schema Diff | 1/3 | In Progress|  |
+| 10. Schema Diff | 2/3 | In Progress|  |
