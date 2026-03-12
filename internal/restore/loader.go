@@ -21,6 +21,7 @@ import (
 	serializeCompositetype "github.com/pgbkrs/pgbackup/internal/serialize/compositetype"
 	serializeDomain "github.com/pgbkrs/pgbackup/internal/serialize/domain"
 	serializeEnum "github.com/pgbkrs/pgbackup/internal/serialize/enum"
+	serializeForeignkey "github.com/pgbkrs/pgbackup/internal/serialize/foreignkey"
 	serializeFunction "github.com/pgbkrs/pgbackup/internal/serialize/function"
 	serializeMatview "github.com/pgbkrs/pgbackup/internal/serialize/matview"
 	serializePolicy "github.com/pgbkrs/pgbackup/internal/serialize/policy"
@@ -41,17 +42,14 @@ var kindToDir = map[string]string{
 	"domain":            "domains",
 	"enum":              "enums",
 	"policy":            "policies",
+	"fk":               "foreignkeys",
 }
 
 // defYAMLPath returns the path to def.yaml for a restore entry.
-// Returns "" for FK entries (no YAML file in backup).
 // Partition children: <schema>/tables/<parent>/partitions/<child>/def.yaml
 // Regular tables:     <schema>/tables/<name>/def.yaml
 // Non-table objects:  <schema>/<kindDir>/<name>.yaml
 func defYAMLPath(backupDir string, entry resolve.RestoreEntry) string {
-	if entry.Kind == "fk" {
-		return ""
-	}
 	if entry.Kind == "table" {
 		if entry.FromTable != "" {
 			return filepath.Join(backupDir, entry.Schema, "tables", entry.FromTable, "partitions", entry.Name, "def.yaml")
@@ -66,8 +64,11 @@ func defYAMLPath(backupDir string, entry resolve.RestoreEntry) string {
 }
 
 // serializerFor returns the Serializer for a given object kind string.
-// Returns nil for "fk" and unknown kinds.
 func serializerFor(kind string) core.Serializer {
+	// The manifest uses "fk" for foreign keys; core uses "foreign_key".
+	if kind == "fk" {
+		return &serializeForeignkey.Serializer{}
+	}
 	switch core.ObjectKind(kind) {
 	case core.KindTable:
 		return &serializeTable.Serializer{}
@@ -89,6 +90,8 @@ func serializerFor(kind string) core.Serializer {
 		return &serializeEnum.Serializer{}
 	case core.KindPolicy:
 		return &serializePolicy.Serializer{}
+	case core.KindForeignKey:
+		return &serializeForeignkey.Serializer{}
 	default:
 		return nil
 	}

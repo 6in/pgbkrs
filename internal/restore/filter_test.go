@@ -13,7 +13,7 @@ func TestBuildTransitiveClosure_Direct(t *testing.T) {
 		{ID: "public.a", Kind: "table", DependsOn: []string{"public.b"}},
 		{ID: "public.b", Kind: "table", DependsOn: nil},
 	}
-	closure := buildTransitiveClosure(objects, []string{"public.a"})
+	closure := buildTransitiveClosure(objects, []string{"public.a"}, nil)
 	if !closure["public.a"] {
 		t.Error("expected public.a in closure")
 	}
@@ -29,7 +29,7 @@ func TestBuildTransitiveClosure_Transitive(t *testing.T) {
 		{ID: "public.b", Kind: "table", DependsOn: []string{"public.c"}},
 		{ID: "public.c", Kind: "table", DependsOn: nil},
 	}
-	closure := buildTransitiveClosure(objects, []string{"public.a"})
+	closure := buildTransitiveClosure(objects, []string{"public.a"}, nil)
 	for _, id := range []string{"public.a", "public.b", "public.c"} {
 		if !closure[id] {
 			t.Errorf("expected %s in closure", id)
@@ -43,7 +43,7 @@ func TestBuildTransitiveClosure_Cycle(t *testing.T) {
 		{ID: "public.a", Kind: "table", DependsOn: []string{"public.b"}},
 		{ID: "public.b", Kind: "table", DependsOn: []string{"public.a"}},
 	}
-	closure := buildTransitiveClosure(objects, []string{"public.a"})
+	closure := buildTransitiveClosure(objects, []string{"public.a"}, nil)
 	if !closure["public.a"] {
 		t.Error("expected public.a in closure")
 	}
@@ -62,7 +62,7 @@ func TestBuildTransitiveClosure_FKEntry(t *testing.T) {
 		{ID: "public.orphan_fk", Kind: "fk", DependsOn: []string{"public.other", "public.source"}},
 	}
 	// BFS seed is only "public.source" - should not follow fk forward
-	closure := buildTransitiveClosure(objects, []string{"public.source"})
+	closure := buildTransitiveClosure(objects, []string{"public.source"}, nil)
 	if !closure["public.source"] {
 		t.Error("expected public.source in closure")
 	}
@@ -77,7 +77,7 @@ func TestBuildTransitiveClosure_FKEntry(t *testing.T) {
 	}
 
 	// Now seed both source and target: FK should be included
-	closureBoth := buildTransitiveClosure(objects, []string{"public.source", "public.target"})
+	closureBoth := buildTransitiveClosure(objects, []string{"public.source", "public.target"}, nil)
 	if !closureBoth["public.fk_source_target"] {
 		t.Error("expected public.fk_source_target in closure when both deps are present")
 	}

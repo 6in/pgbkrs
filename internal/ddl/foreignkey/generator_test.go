@@ -50,7 +50,7 @@ func TestGenerateDrop(t *testing.T) {
 		t.Fatalf("expected 1 statement, got %d", len(stmts))
 	}
 
-	expected := "ALTER TABLE public.orders DROP CONSTRAINT IF EXISTS fk_orders_customer CASCADE"
+	expected := "ALTER TABLE IF EXISTS public.orders DROP CONSTRAINT IF EXISTS fk_orders_customer CASCADE"
 	if stmts[0] != expected {
 		t.Errorf("expected:\n%s\ngot:\n%s", expected, stmts[0])
 	}

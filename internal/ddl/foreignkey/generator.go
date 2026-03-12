@@ -32,7 +32,7 @@ func (g *DDLGenerator) GenerateDrop(def core.ObjectDef) ([]string, error) {
 		return nil, fmt.Errorf("foreignkey.DDLGenerator.GenerateDrop: expected *core.ForeignKeyDef, got %T", def)
 	}
 
-	stmt := fmt.Sprintf("ALTER TABLE %s.%s DROP CONSTRAINT IF EXISTS %s CASCADE",
+	stmt := fmt.Sprintf("ALTER TABLE IF EXISTS %s.%s DROP CONSTRAINT IF EXISTS %s CASCADE",
 		fk.Schema, fk.SourceTable, fk.Name)
 
 	return []string{stmt}, nil

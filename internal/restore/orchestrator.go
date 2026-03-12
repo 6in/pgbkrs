@@ -12,7 +12,6 @@ import (
 
 	"github.com/pgbkrs/pgbackup/internal/backup"
 	"github.com/pgbkrs/pgbackup/internal/core"
-	fetchForeignkey "github.com/pgbkrs/pgbackup/internal/fetch/foreignkey"
 	"github.com/pgbkrs/pgbackup/internal/resolve"
 )
 
@@ -126,6 +125,20 @@ func RunRestore(ctx context.Context, conn *pgx.Conn, opts Options) error {
 		}
 	}
 
+	// Wave 1.5: CREATE SCHEMA IF NOT EXISTS for all schemas in restoreOrder
+	// (required when schemas were dropped or never existed on the target DB)
+	createdSchemas := make(map[string]bool)
+	for _, entry := range restoreOrder {
+		if createdSchemas[entry.Schema] {
+			continue
+		}
+		createdSchemas[entry.Schema] = true
+		if _, err := conn.Exec(ctx, fmt.Sprintf(`CREATE SCHEMA IF NOT EXISTS %s`, entry.Schema)); err != nil {
+			restoreErr = fmt.Errorf("create schema %s: %w", entry.Schema, err)
+			return restoreErr
+		}
+	}
+
 	// Wave 2: CREATE schema-only objects (tables, sequences, types, domains, enums) (REST-04)
 	schemaWaveKinds := map[string]bool{
 		"table": true, "sequence": true, "type": true, "domain": true, "enum": true,
@@ -200,6 +213,11 @@ func RunRestore(ctx context.Context, conn *pgx.Conn, opts Options) error {
 			restoreErr = fmt.Errorf("expected SequenceDef for %s.%s, got %T", entry.Schema, entry.Name, def)
 			return restoreErr
 		}
+		// Skip setval for sequences that were never used (LastValue=0, IsCalled=false).
+		// PostgreSQL sequences have a minimum of 1; setval(seq, 0) is invalid.
+		if sd.LastValue == 0 && !sd.IsCalled {
+			continue
+		}
 		sql := fmt.Sprintf(`SELECT setval('%s.%s', %d, %v)`,
 			sd.Schema, sd.Name, sd.LastValue, sd.IsCalled)
 		if _, err := conn.Exec(ctx, sql); err != nil {
@@ -238,7 +256,7 @@ func RunRestore(ctx context.Context, conn *pgx.Conn, opts Options) error {
 		if entry.Kind != "fk" {
 			continue
 		}
-		if err := execFKCreate(ctx, conn, entry); err != nil {
+		if err := execFKCreate(ctx, conn, opts.BackupDir, entry); err != nil {
 			restoreErr = fmt.Errorf("apply FK %s.%s: %w", entry.Schema, entry.Name, err)
 			return restoreErr
 		}
@@ -372,31 +390,22 @@ func quotedColList(cols []string) string {
 	return strings.Join(quoted, ", ")
 }
 
-// execFKCreate re-fetches FK definitions from the live database (post-table-creation)
-// and executes the ALTER TABLE ... ADD CONSTRAINT DDL for the given FK entry.
-func execFKCreate(ctx context.Context, conn *pgx.Conn, entry resolve.RestoreEntry) error {
-	// FKs are not serialized to disk. Re-fetch from the database post-table-creation.
-	fetcher := &fetchForeignkey.SchemaFetcher{}
-	defs, err := fetcher.Fetch(ctx, conn, entry.Schema)
+// execFKCreate loads the FK definition from the backup directory and executes
+// the ALTER TABLE ... ADD CONSTRAINT DDL for the given FK entry.
+func execFKCreate(ctx context.Context, conn *pgx.Conn, backupDir string, entry resolve.RestoreEntry) error {
+	def, err := loadObjectDef(backupDir, entry)
 	if err != nil {
-		return fmt.Errorf("fetch FKs for schema %s: %w", entry.Schema, err)
+		return fmt.Errorf("load FK def %s.%s: %w", entry.Schema, entry.Name, err)
 	}
-	for _, def := range defs {
-		h := def.Header()
-		if h.Name != entry.Name {
-			continue
-		}
-		gen := ddlGeneratorFor("fk")
-		stmts, err := gen.GenerateDDL(def)
-		if err != nil {
-			return fmt.Errorf("generate FK DDL %s: %w", entry.Name, err)
-		}
-		for _, stmt := range stmts {
-			if _, err := conn.Exec(ctx, stmt); err != nil {
-				return fmt.Errorf("exec FK DDL %s: %w", entry.Name, err)
-			}
-		}
-		return nil
+	gen := ddlGeneratorFor("fk")
+	stmts, err := gen.GenerateDDL(def)
+	if err != nil {
+		return fmt.Errorf("generate FK DDL %s: %w", entry.Name, err)
 	}
-	return fmt.Errorf("FK %s.%s not found in database after table creation", entry.Schema, entry.Name)
+	for _, stmt := range stmts {
+		if _, err := conn.Exec(ctx, stmt); err != nil {
+			return fmt.Errorf("exec FK DDL %s: %w", entry.Name, err)
+		}
+	}
+	return nil
 }

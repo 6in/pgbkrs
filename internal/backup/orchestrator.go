@@ -27,6 +27,7 @@ import (
 	serializeDomain "github.com/pgbkrs/pgbackup/internal/serialize/domain"
 	serializeEnum "github.com/pgbkrs/pgbackup/internal/serialize/enum"
 	serializeFunction "github.com/pgbkrs/pgbackup/internal/serialize/function"
+	serializeForeignkey "github.com/pgbkrs/pgbackup/internal/serialize/foreignkey"
 	serializeMatview "github.com/pgbkrs/pgbackup/internal/serialize/matview"
 	serializePolicy "github.com/pgbkrs/pgbackup/internal/serialize/policy"
 	serializeSequence "github.com/pgbkrs/pgbackup/internal/serialize/sequence"
@@ -50,6 +51,7 @@ var kindToDir = map[core.ObjectKind]string{
 	core.KindDomain:           "domains",
 	core.KindEnum:             "enums",
 	core.KindPolicy:           "policies",
+	core.KindForeignKey:       "foreignkeys",
 }
 
 // kindFetcher pairs an ObjectKind with its corresponding SchemaFetcher.
@@ -185,21 +187,18 @@ func RunBackup(ctx context.Context, conn *pgx.Conn, outDir string, snapshot bool
 				return fmt.Errorf("fetch %s in schema %s: %w", kf.kind, schema, err)
 			}
 			for _, def := range defs {
-				// ForeignKey objects are tracked for manifest but not written as standalone YAML files.
-				if kf.kind != core.KindForeignKey {
-					s := serializerFor(kf.kind)
-					if s != nil {
-						b, err := s.Serialize(def)
-						if err != nil {
-							return fmt.Errorf("serialize %s %s: %w", kf.kind, def.Header().Name, err)
-						}
-						dir := filepath.Join(backupRoot, schema, kindToDir[kf.kind])
-						if err := os.MkdirAll(dir, 0755); err != nil {
-							return fmt.Errorf("create dir %s: %w", dir, err)
-						}
-						if err := os.WriteFile(filepath.Join(dir, def.Header().Name+".yaml"), b, 0644); err != nil {
-							return fmt.Errorf("write yaml for %s: %w", def.Header().Name, err)
-						}
+				s := serializerFor(kf.kind)
+				if s != nil {
+					b, err := s.Serialize(def)
+					if err != nil {
+						return fmt.Errorf("serialize %s %s: %w", kf.kind, def.Header().Name, err)
+					}
+					dir := filepath.Join(backupRoot, schema, kindToDir[kf.kind])
+					if err := os.MkdirAll(dir, 0755); err != nil {
+						return fmt.Errorf("create dir %s: %w", dir, err)
+					}
+					if err := os.WriteFile(filepath.Join(dir, def.Header().Name+".yaml"), b, 0644); err != nil {
+						return fmt.Errorf("write yaml for %s: %w", def.Header().Name, err)
 					}
 				}
 				allObjects = append(allObjects, def)
@@ -294,9 +293,10 @@ func columnNames(td *core.TableDef) []string {
 }
 
 // serializerFor returns the appropriate Serializer for the given ObjectKind.
-// Returns nil for ForeignKey and unknown kinds.
 func serializerFor(kind core.ObjectKind) core.Serializer {
 	switch kind {
+	case core.KindForeignKey:
+		return &serializeForeignkey.Serializer{}
 	case core.KindView:
 		return &serializeView.Serializer{}
 	case core.KindMaterializedView:

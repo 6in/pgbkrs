@@ -209,6 +209,16 @@ func fromYAML(yd yamlTableDef) *core.TableDef {
 		}
 	}
 
+	// DataMeta
+	if yd.Data != nil {
+		td.DataMeta = &core.TableDataMeta{
+			File:     yd.Data.File,
+			Columns:  yd.Data.Columns,
+			RowCount: yd.Data.RowCount,
+			Checksum: yd.Data.Checksum,
+		}
+	}
+
 	return td
 }
 

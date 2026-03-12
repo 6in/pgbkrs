@@ -37,10 +37,10 @@ func TestDefYAMLPath(t *testing.T) {
 			want:      filepath.Join("backup", "pub", "views", "active_users.yaml"),
 		},
 		{
-			name:      "fk returns empty",
+			name:      "fk returns foreignkeys path",
 			backupDir: "backup",
 			entry:     resolve.RestoreEntry{Schema: "pub", Kind: "fk", Name: "fk_order_user"},
-			want:      "",
+			want:      filepath.Join("backup", "pub", "foreignkeys", "fk_order_user.yaml"),
 		},
 		{
 			name:      "sequence",
@@ -62,7 +62,7 @@ func TestDefYAMLPath(t *testing.T) {
 
 // TestSerializerFor verifies serializerFor returns non-nil for supported kinds and nil for unsupported.
 func TestSerializerFor(t *testing.T) {
-	supported := []string{"table", "view", "materialized_view", "function", "sequence", "trigger", "type", "domain", "enum", "policy"}
+	supported := []string{"table", "view", "materialized_view", "function", "sequence", "trigger", "type", "domain", "enum", "policy", "fk", "foreign_key"}
 	for _, kind := range supported {
 		s := serializerFor(kind)
 		if s == nil {
@@ -70,7 +70,7 @@ func TestSerializerFor(t *testing.T) {
 		}
 	}
 
-	unsupported := []string{"fk", "foreign_key", "unknown"}
+	unsupported := []string{"unknown"}
 	for _, kind := range unsupported {
 		s := serializerFor(kind)
 		if s != nil {

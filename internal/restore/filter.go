@@ -17,8 +17,9 @@ type Options struct {
 }
 
 // buildTransitiveClosure computes the set of all objects reachable from seeds via BFS.
+// fkTargets maps source_table_id → []target_table_id for directed FK edges (source must pull in target).
 // After BFS, a post-BFS pass adds FK entries whose full DependsOn set is a subset of the closure.
-func buildTransitiveClosure(objects []resolve.ObjectEntry, seeds []string) map[string]bool {
+func buildTransitiveClosure(objects []resolve.ObjectEntry, seeds []string, fkTargets map[string][]string) map[string]bool {
 	// Build byID map
 	byID := make(map[string]resolve.ObjectEntry, len(objects))
 	for _, obj := range objects {
@@ -36,7 +37,7 @@ func buildTransitiveClosure(objects []resolve.ObjectEntry, seeds []string) map[s
 		}
 	}
 
-	// Standard BFS — only follow non-FK edges
+	// BFS — follow non-FK DependsOn edges and directed FK target edges
 	for len(queue) > 0 {
 		cur := queue[0]
 		queue = queue[1:]
@@ -52,6 +53,14 @@ func buildTransitiveClosure(objects []resolve.ObjectEntry, seeds []string) map[s
 			if !visited[dep] {
 				visited[dep] = true
 				queue = append(queue, dep)
+			}
+		}
+		// Follow directed FK edges: if this table has FK constraints pointing to other tables,
+		// those tables must be in the closure too (FK target must exist before source can be restored).
+		for _, target := range fkTargets[cur] {
+			if !visited[target] {
+				visited[target] = true
+				queue = append(queue, target)
 			}
 		}
 	}
@@ -103,8 +112,30 @@ func filteredRestoreOrder(manifest *resolve.Manifest, opts Options) ([]resolve.R
 	}
 
 	if opts.Object != "" {
+		// Build directed FK edges: source_table_id → []target_table_id
+		// Using RestoreOrder.FromTable to distinguish source from target.
+		objByID := make(map[string]resolve.ObjectEntry, len(manifest.Objects))
+		for _, obj := range manifest.Objects {
+			objByID[obj.ID] = obj
+		}
+		fkTargets := make(map[string][]string)
+		for _, entry := range manifest.RestoreOrder {
+			if entry.Kind != "fk" || entry.FromTable == "" {
+				continue
+			}
+			sourceID := entry.Schema + "." + entry.FromTable
+			fkID := entry.Schema + "." + entry.Name
+			if fkObj, ok := objByID[fkID]; ok {
+				for _, dep := range fkObj.DependsOn {
+					if dep != sourceID {
+						fkTargets[sourceID] = append(fkTargets[sourceID], dep)
+					}
+				}
+			}
+		}
+
 		// BFS closure from the named object
-		closure := buildTransitiveClosure(manifest.Objects, []string{opts.Object})
+		closure := buildTransitiveClosure(manifest.Objects, []string{opts.Object}, fkTargets)
 		if err := verifyDepsPresent(manifest.Objects, closure); err != nil {
 			return nil, err
 		}
