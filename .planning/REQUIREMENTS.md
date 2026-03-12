@@ -65,11 +65,11 @@
 
 ### Schema Diff
 
-- [ ] **DIFF-01**: バックアップ同士のスキーマ比較（データ差分は対象外）
-- [ ] **DIFF-02**: オブジェクトの追加・削除検出
-- [ ] **DIFF-03**: テーブル変更検出（カラム追加・削除・型変更・NULL制約・デフォルト値、インデックス、制約、トリガー、RLS）
-- [ ] **DIFF-04**: ビュー・マテビュー・関数・シーケンス・型・ドメイン・ENUMの変更検出（変更あり/なし）
-- [ ] **DIFF-05**: 差分結果の整形出力（仕様書9.3準拠）
+- [x] **DIFF-01**: バックアップ同士のスキーマ比較（データ差分は対象外）
+- [x] **DIFF-02**: オブジェクトの追加・削除検出
+- [x] **DIFF-03**: テーブル変更検出（カラム追加・削除・型変更・NULL制約・デフォルト値、インデックス、制約、トリガー、RLS）
+- [x] **DIFF-04**: ビュー・マテビュー・関数・シーケンス・型・ドメイン・ENUMの変更検出（変更あり/なし）
+- [x] **DIFF-05**: 差分結果の整形出力（仕様書9.3準拠）
 
 ### DDL Generation
 
@@ -145,11 +145,11 @@
 | REST-11 | Phase 9 | Complete |
 | REST-12 | Phase 9 | Complete |
 | REST-13 | Phase 9 | Complete |
-| DIFF-01 | Phase 10 | Pending |
-| DIFF-02 | Phase 10 | Pending |
-| DIFF-03 | Phase 10 | Pending |
-| DIFF-04 | Phase 10 | Pending |
-| DIFF-05 | Phase 10 | Pending |
+| DIFF-01 | Phase 10 | Complete |
+| DIFF-02 | Phase 10 | Complete |
+| DIFF-03 | Phase 10 | Complete |
+| DIFF-04 | Phase 10 | Complete |
+| DIFF-05 | Phase 10 | Complete |
 
 **Coverage:**
 - v1 requirements: 47 total
