@@ -49,10 +49,10 @@ completed: 2026-03-12
 
 ## Performance
 
-- **Duration:** 2 min
+- **Duration:** 5 min
 - **Started:** 2026-03-12T08:30:53Z
-- **Completed:** 2026-03-12T08:32:11Z
-- **Tasks:** 1 of 2 automated (Task 2 is human-verify checkpoint)
+- **Completed:** 2026-03-12T08:36:21Z
+- **Tasks:** 2 of 2 complete
 - **Files modified:** 2
 
 ## Accomplishments
@@ -60,13 +60,15 @@ completed: 2026-03-12
 - Replaced diffCmd stub with wired implementation: `cobra.ExactArgs(2)` + `diff.Run(args[0], args[1], os.Stdout)`
 - Added early-return guard in PersistentPreRunE: `if cmd.Name() == "diff" { return nil }` — diff reads backup dirs from disk; no DB connection needed
 - `go build ./...` exits 0, `go test ./...` exits 0 with all packages passing
-- Binary built at `bin/pgbackup` ready for human verification
+- Human verified: `pgbackup diff /tmp/backup_a /tmp/backup_b` prints `比較: backup_a → backup_b` + `(差分なし)` — correct spec 9.3 output
+- Verified `pgbackup backup --help` still shows DB flags — PersistentPreRunE not broken for other commands
 
 ## Task Commits
 
 Each task was committed atomically:
 
 1. **Task 1: Wire diffCmd to diff.Run() and fix PersistentPreRunE DB skip** - `951ab62` (feat)
+2. **Task 2: Human verify pgbackup diff output matches spec 9.3** - approved by user (no code changes)
 
 ## Files Created/Modified
 
@@ -91,9 +93,19 @@ None - no external service configuration required.
 
 ## Next Phase Readiness
 
-- `pgbackup diff <backup-a> <backup-b>` is functional end-to-end
-- Binary at `bin/pgbackup` ready for human verification against spec 9.3
-- All prior phases remain unaffected (go test ./... passes)
+Phase 10 (Schema Diff) is fully complete. All three plans delivered:
+- 10-01: diff package scaffold and types
+- 10-02: compare engine, loader, and spec 9.3 report formatter
+- 10-03: CLI wiring and PersistentPreRunE fix
+
+The project milestone v1.0 is now complete. `pgbackup backup`, `pgbackup restore`, and `pgbackup diff` are all functional end-to-end.
+
+## Self-Check: PASSED
+
+- SUMMARY.md: FOUND
+- diff.go: FOUND
+- root.go: FOUND
+- Commit 951ab62: FOUND
 
 ---
 *Phase: 10-schema-diff*
