@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Backup Orchestration** - End-to-end backup command: directory structure, skip detection, snapshot mode (completed 2026-03-11)
 - [x] **Phase 8: Restore - Core Pipeline** - Pre-backup, DROP cycle, CREATE cycle, data load, sequence restoration, indexes, FK application (completed 2026-03-11)
 - [x] **Phase 9: Restore - Partial & Safety** - Granular restore (schema/object scope), dependency chain resolution, drop-leak detection, restore logs (completed 2026-03-11)
-- [ ] **Phase 10: Schema Diff** - Compare two backups at schema level, detect additions/deletions/modifications, formatted output
+- [x] **Phase 10: Schema Diff** - Compare two backups at schema level, detect additions/deletions/modifications, formatted output (completed 2026-03-12)
 
 ## Phase Details
 
@@ -207,4 +207,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Backup Orchestration | 2/2 | Complete   | 2026-03-11 |
 | 8. Restore - Core Pipeline | 3/3 | Complete   | 2026-03-11 |
 | 9. Restore - Partial & Safety | 3/3 | Complete   | 2026-03-11 |
-| 10. Schema Diff | 2/3 | In Progress|  |
+| 10. Schema Diff | 3/3 | Complete   | 2026-03-12 |
