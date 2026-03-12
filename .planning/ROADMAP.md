@@ -13,10 +13,10 @@ Build a PostgreSQL backup/restore CLI tool in Go that exports schema definitions
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Project scaffold, CLI subcommands, DB connection, command pattern interfaces (completed 2026-03-11)
-- [ ] **Phase 2: Schema Fetch - Tables & Sequences** - pg_catalog extraction for tables, sequences, composite types, domains, and ENUMs
+- [x] **Phase 2: Schema Fetch - Tables & Sequences** - pg_catalog extraction for tables, sequences, composite types, domains, and ENUMs (completed 2026-03-12)
 - [x] **Phase 3: Schema Fetch - Views, Functions, Triggers & Policies** - pg_catalog extraction for views, materialized views, functions, triggers, and RLS policies (completed 2026-03-11)
 - [x] **Phase 4: DDL Generation** - CREATE and DROP DDL generation from fetched definitions for all object types (completed 2026-03-11)
-- [ ] **Phase 5: Serialization** - YAML output for all object types, CSV data export, partition handling, checksums
+- [x] **Phase 5: Serialization** - YAML output for all object types, CSV data export, partition handling, checksums (completed 2026-03-12)
 - [x] **Phase 6: Dependency Resolution & Manifest** - In-memory DAG, Kahn topological sort, FK isolation, _manifest.yaml output (completed 2026-03-11)
 - [x] **Phase 7: Backup Orchestration** - End-to-end backup command: directory structure, skip detection, snapshot mode (completed 2026-03-11)
 - [x] **Phase 8: Restore - Core Pipeline** - Pre-backup, DROP cycle, CREATE cycle, data load, sequence restoration, indexes, FK application (completed 2026-03-11)
