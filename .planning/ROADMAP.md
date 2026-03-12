@@ -184,7 +184,12 @@ Plans:
   2. Table changes show column additions/deletions/type changes, NULL constraint changes, default value changes, index changes, constraint changes, trigger changes, and RLS changes
   3. Views, materialized views, functions, sequences, types, domains, and ENUMs each report whether they changed (changed/unchanged) without line-level diffs
   4. The diff output follows spec section 9.3 formatting and is printed to stdout
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 10-01-PLAN.md — Wave 0 test stubs for all five DIFF requirements + internal/diff package skeletons
+- [ ] 10-02-PLAN.md — Full diff engine: loader, compareObjects, diffTable, diffNonTable, formatReport
+- [ ] 10-03-PLAN.md — CLI wiring (diffCmd positional args, PersistentPreRunE DB skip) + human verify checkpoint
 
 ## Progress
 
@@ -202,4 +207,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Backup Orchestration | 2/2 | Complete   | 2026-03-11 |
 | 8. Restore - Core Pipeline | 3/3 | Complete   | 2026-03-11 |
 | 9. Restore - Partial & Safety | 3/3 | Complete   | 2026-03-11 |
-| 10. Schema Diff | 0/TBD | Not started | - |
+| 10. Schema Diff | 0/3 | Not started | - |
