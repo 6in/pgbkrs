@@ -27,6 +27,9 @@ var rootCmd = &cobra.Command{
 	SilenceUsage:  true,
 	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		if cmd.Name() == "diff" {
+			return nil // diff reads backup dirs from disk; no DB connection needed
+		}
 		connStr := db.BuildConnString(host, port, user, password, dbname)
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()

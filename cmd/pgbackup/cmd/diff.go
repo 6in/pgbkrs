@@ -1,13 +1,17 @@
 package cmd
 
-import "github.com/spf13/cobra"
+import (
+	"os"
+
+	"github.com/pgbkrs/pgbackup/internal/diff"
+	"github.com/spf13/cobra"
+)
 
 var diffCmd = &cobra.Command{
-	Use:   "diff",
-	Short: "Diff two PostgreSQL schemas and show structural differences",
+	Use:   "diff <backup-a> <backup-b>",
+	Short: "Compare two backup directories at the schema level",
+	Args:  cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// conn available here from PersistentPreRunE
-		// Phase 10+ will add real diff logic
-		return nil
+		return diff.Run(args[0], args[1], os.Stdout)
 	},
 }
