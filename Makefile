@@ -1,10 +1,29 @@
-BINARY := pgbackup
-CMD    := ./cmd/pgbackup
+BINARY  := pgbackup
+CMD     := ./cmd/pgbackup
+VERSION ?= dev
 
-.PHONY: build test test-integration lint clean testdb-start testdb-stop
+PLATFORMS := \
+	linux/amd64 \
+	linux/arm64 \
+	darwin/amd64 \
+	darwin/arm64 \
+	windows/amd64
+
+.PHONY: build build-all test test-integration lint clean testdb-start testdb-stop
 
 build:
 	go build -o bin/$(BINARY) $(CMD)
+
+build-all:
+	@mkdir -p dist
+	@$(foreach platform,$(PLATFORMS), \
+		$(eval OS   := $(word 1,$(subst /, ,$(platform)))) \
+		$(eval ARCH := $(word 2,$(subst /, ,$(platform)))) \
+		$(eval EXT  := $(if $(filter windows,$(OS)),.exe,)) \
+		$(eval OUT  := dist/$(BINARY)-$(VERSION)-$(OS)-$(ARCH)$(EXT)) \
+		echo "Building $(OUT) ..."; \
+		GOOS=$(OS) GOARCH=$(ARCH) go build -o $(OUT) $(CMD); \
+	)
 
 test:
 	go test -short ./...
