@@ -7,7 +7,8 @@ PLATFORMS := \
 	linux/arm64 \
 	darwin/amd64 \
 	darwin/arm64 \
-	windows/amd64
+	windows/amd64 \
+	windows/arm64
 
 .PHONY: build build-all test test-integration lint clean testdb-start testdb-stop
 
