@@ -1,2 +1,10 @@
 bin/
 dist/
+
+# Restore log directories (generated at runtime)
+internal/restore/restore_*/
+
+# Claude Code / GSD framework
+.agents/
+.claude/
+skills-lock.json
