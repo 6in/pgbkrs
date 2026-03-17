@@ -24,6 +24,8 @@ All subcommands (except `diff`) require a database connection:
 
 ## Commands
 
+> Run `pgbackup <command> --help` to see all available flags for each subcommand.
+
 ### `backup`
 
 Back up a PostgreSQL database to a timestamped directory of YAML and CSV files.

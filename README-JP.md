@@ -24,6 +24,8 @@ go build -o pgbackup ./cmd/pgbackup
 
 ## コマンド
 
+> 各サブコマンドのフラグ一覧は `pgbackup <command> --help` で確認できます。
+
 ### `backup`
 
 PostgreSQL データベースをタイムスタンプ付きのディレクトリへ YAML + CSV 形式でバックアップします。
