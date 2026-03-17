@@ -66,7 +66,7 @@ type kindFetcher struct {
 // transaction; tx.Conn() is passed so that COPY participates in the snapshot.
 func RunBackup(ctx context.Context, conn *pgx.Conn, outDir string, snapshot bool) error {
 	// 1. Create timestamped backup root
-	backupRoot := filepath.Join(outDir, time.Now().UTC().Format("backup_20060102_150405"))
+	backupRoot := filepath.Join(outDir, time.Now().Local().Format("backup_20060102_150405"))
 	if err := os.MkdirAll(backupRoot, 0755); err != nil {
 		return fmt.Errorf("create backup root: %w", err)
 	}
