@@ -11,9 +11,11 @@ import (
 type Options struct {
 	BackupDir    string
 	PreBackupDir string
-	Schema       string // REST-10: filter to schema (e.g. "myschema")
-	Object       string // REST-10: filter to "schema.name"; implies BFS (REST-11)
-	LogDir       string // REST-13: parent dir for restore_YYYYMMDD_HHMMSS/ logs
+	Schema       string   // REST-10: filter to schema (e.g. "myschema")
+	Object       string   // REST-10: filter to "schema.name"; implies BFS (REST-11)
+	Schemas      []string // multi-schema filter (used by restore-tui)
+	Objects      []string // multi-object BFS union filter (used by restore-tui)
+	LogDir       string   // REST-13: parent dir for restore_YYYYMMDD_HHMMSS/ logs
 }
 
 // buildTransitiveClosure computes the set of all objects reachable from seeds via BFS.
@@ -154,6 +156,55 @@ func filteredRestoreOrder(manifest *resolve.Manifest, opts Options) ([]resolve.R
 		var result []resolve.RestoreEntry
 		for _, entry := range manifest.RestoreOrder {
 			if entry.Schema == opts.Schema {
+				result = append(result, entry)
+			}
+		}
+		return result, nil
+	}
+
+	// Multi-select from restore-tui: union of schemas and individual object BFS closures.
+	if len(opts.Schemas) > 0 || len(opts.Objects) > 0 {
+		schemaSet := make(map[string]bool, len(opts.Schemas))
+		for _, s := range opts.Schemas {
+			schemaSet[s] = true
+		}
+
+		var objectClosure map[string]bool
+		if len(opts.Objects) > 0 {
+			for _, obj := range opts.Objects {
+				if !strings.Contains(obj, ".") {
+					return nil, fmt.Errorf("object %q must be in schema.name format", obj)
+				}
+			}
+			objByID := make(map[string]resolve.ObjectEntry, len(manifest.Objects))
+			for _, obj := range manifest.Objects {
+				objByID[obj.ID] = obj
+			}
+			fkTargets := make(map[string][]string)
+			for _, entry := range manifest.RestoreOrder {
+				if entry.Kind != "fk" || entry.FromTable == "" {
+					continue
+				}
+				sourceID := entry.Schema + "." + entry.FromTable
+				fkID := entry.Schema + "." + entry.Name
+				if fkObj, ok := objByID[fkID]; ok {
+					for _, dep := range fkObj.DependsOn {
+						if dep != sourceID {
+							fkTargets[sourceID] = append(fkTargets[sourceID], dep)
+						}
+					}
+				}
+			}
+			objectClosure = buildTransitiveClosure(manifest.Objects, opts.Objects, fkTargets)
+			if err := verifyDepsPresent(manifest.Objects, objectClosure); err != nil {
+				return nil, err
+			}
+		}
+
+		var result []resolve.RestoreEntry
+		for _, entry := range manifest.RestoreOrder {
+			id := entry.Schema + "." + entry.Name
+			if schemaSet[entry.Schema] || (objectClosure != nil && objectClosure[id]) {
 				result = append(result, entry)
 			}
 		}
