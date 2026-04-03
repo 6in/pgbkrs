@@ -262,36 +262,42 @@ func RunRestore(ctx context.Context, conn *pgx.Conn, opts Options) error {
 		}
 	}
 
-	// Wave 7: Views, materialized views, functions, triggers, policies (REST-09)
-	remainderKinds := map[string]bool{
-		"view": true, "materialized_view": true, "function": true, "trigger": true, "policy": true,
+	// Wave 7: functions, views/matviews, triggers/policies (REST-09)
+	// Split into three passes so functions are always created before views that call them,
+	// regardless of the order they appear in the manifest restore_order.
+	wave7Passes := []map[string]bool{
+		{"function": true},
+		{"view": true, "materialized_view": true},
+		{"trigger": true, "policy": true},
 	}
-	for _, entry := range restoreOrder {
-		if !remainderKinds[entry.Kind] {
-			continue
-		}
-		def, err := loadObjectDef(opts.BackupDir, entry)
-		if err != nil {
-			restoreErr = fmt.Errorf("load def for %s.%s: %w", entry.Schema, entry.Name, err)
-			return restoreErr
-		}
-		gen := ddlGeneratorFor(entry.Kind)
-		if gen == nil {
-			continue
-		}
-		stmts, err := gen.GenerateDDL(def)
-		if err != nil {
-			restoreErr = fmt.Errorf("generate DDL for %s.%s: %w", entry.Schema, entry.Name, err)
-			return restoreErr
-		}
-		for _, stmt := range stmts {
-			if _, err := conn.Exec(ctx, stmt); err != nil {
-				restoreErr = fmt.Errorf("exec DDL %s.%s: %w", entry.Schema, entry.Name, err)
+	for _, kinds := range wave7Passes {
+		for _, entry := range restoreOrder {
+			if !kinds[entry.Kind] {
+				continue
+			}
+			def, err := loadObjectDef(opts.BackupDir, entry)
+			if err != nil {
+				restoreErr = fmt.Errorf("load def for %s.%s: %w", entry.Schema, entry.Name, err)
 				return restoreErr
 			}
-		}
-		if logger != nil {
-			logger.LogRestore(entry.Schema, entry.Kind, entry.Name, nil)
+			gen := ddlGeneratorFor(entry.Kind)
+			if gen == nil {
+				continue
+			}
+			stmts, err := gen.GenerateDDL(def)
+			if err != nil {
+				restoreErr = fmt.Errorf("generate DDL for %s.%s: %w", entry.Schema, entry.Name, err)
+				return restoreErr
+			}
+			for _, stmt := range stmts {
+				if _, err := conn.Exec(ctx, stmt); err != nil {
+					restoreErr = fmt.Errorf("exec DDL %s.%s: %w", entry.Schema, entry.Name, err)
+					return restoreErr
+				}
+			}
+			if logger != nil {
+				logger.LogRestore(entry.Schema, entry.Kind, entry.Name, nil)
+			}
 		}
 	}
 
@@ -359,8 +365,13 @@ func copyFromTable(ctx context.Context, conn *pgx.Conn, backupDir string, entry 
 
 	// Determine the table directory (matches backup layout)
 	var tableDir string
-	if entry.FromTable != "" {
-		tableDir = filepath.Join(backupDir, entry.Schema, "tables", entry.FromTable, "partitions", entry.Name)
+	fromTable := entry.FromTable
+	if fromTable == "" {
+		// Fallback for pre-v0.2.0 backups: locate parent via directory scan.
+		fromTable = findPartitionParent(backupDir, entry.Schema, entry.Name)
+	}
+	if fromTable != "" {
+		tableDir = filepath.Join(backupDir, entry.Schema, "tables", fromTable, "partitions", entry.Name)
 	} else {
 		tableDir = filepath.Join(backupDir, entry.Schema, "tables", entry.Name)
 	}

@@ -36,7 +36,7 @@ import (
 	serializeView "github.com/pgbkrs/pgbackup/internal/serialize/view"
 )
 
-const toolVersion = "0.1.0"
+const toolVersion = "0.2.0"
 
 // kindToDir maps ObjectKind to the subdirectory name under a schema directory.
 // This implements the spec section 4 directory layout.
@@ -119,6 +119,7 @@ func RunBackup(ctx context.Context, conn *pgx.Conn, outDir string, snapshot bool
 
 	var allObjects []core.ObjectDef
 	var skipped []resolve.SkipEntry
+	allChildOf := make(map[string]string) // accumulated across all schemas
 
 	for _, schema := range schemas {
 		// First pass: fetch tables to build childOf map for partition routing.
@@ -127,6 +128,9 @@ func RunBackup(ctx context.Context, conn *pgx.Conn, outDir string, snapshot bool
 			return fmt.Errorf("fetch tables in schema %s: %w", schema, err)
 		}
 		childOf := buildChildOf(rawTables)
+		for k, v := range childOf {
+			allChildOf[k] = v
+		}
 
 		for _, kf := range fetchers {
 			if kf.kind == core.KindTable {
@@ -220,6 +224,7 @@ func RunBackup(ctx context.Context, conn *pgx.Conn, outDir string, snapshot bool
 		ToolVersion: toolVersion,
 		Snapshot:    snapshot,
 		Skipped:     skipped,
+		ChildOf:     allChildOf,
 	}
 	manifest, err := resolve.BuildManifest(allObjects, params)
 	if err != nil {

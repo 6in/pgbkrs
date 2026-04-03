@@ -31,14 +31,14 @@ func TestGenerateDDL_MultipleFields(t *testing.T) {
 	if !strings.HasPrefix(ddl, "CREATE TYPE public.address AS (") {
 		t.Errorf("expected CREATE TYPE public.address AS ( prefix, got: %s", ddl)
 	}
-	if !strings.Contains(ddl, "street text") {
-		t.Errorf("expected 'street text' in DDL, got: %s", ddl)
+	if !strings.Contains(ddl, `"street" text`) {
+		t.Errorf("expected '\"street\" text' in DDL, got: %s", ddl)
 	}
-	if !strings.Contains(ddl, "city text") {
-		t.Errorf("expected 'city text' in DDL, got: %s", ddl)
+	if !strings.Contains(ddl, `"city" text`) {
+		t.Errorf("expected '\"city\" text' in DDL, got: %s", ddl)
 	}
-	if !strings.Contains(ddl, "zip character varying(10)") {
-		t.Errorf("expected 'zip character varying(10)' in DDL, got: %s", ddl)
+	if !strings.Contains(ddl, `"zip" character varying(10)`) {
+		t.Errorf("expected '\"zip\" character varying(10)' in DDL, got: %s", ddl)
 	}
 }
 
@@ -64,8 +64,35 @@ func TestGenerateDDL_SingleField(t *testing.T) {
 	if strings.Contains(ddl, "integer,") {
 		t.Errorf("single field should not have trailing comma, got: %s", ddl)
 	}
-	if !strings.Contains(ddl, "value integer") {
-		t.Errorf("expected 'value integer' in DDL, got: %s", ddl)
+	if !strings.Contains(ddl, `"value" integer`) {
+		t.Errorf("expected '\"value\" integer' in DDL, got: %s", ddl)
+	}
+}
+
+func TestGenerateDDL_SpecialCharFieldNames(t *testing.T) {
+	g := &compositetype.DDLGenerator{}
+	def := core.TypeDef{
+		ObjectHeader: core.ObjectHeader{Kind: core.KindType, Schema: "art_qc", Name: "wsfw_pf"},
+		Fields: []core.CompositeField{
+			{Name: "PF-BL", Type: "character varying(255)"},
+			{Name: "プロセスステップパラメータ#01", Type: "text"},
+			{Name: `has"quote`, Type: "text"},
+		},
+	}
+
+	stmts, err := g.GenerateDDL(def)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ddl := stmts[0]
+	if !strings.Contains(ddl, `"PF-BL" character varying(255)`) {
+		t.Errorf("expected quoted hyphen field, got: %s", ddl)
+	}
+	if !strings.Contains(ddl, `"プロセスステップパラメータ#01" text`) {
+		t.Errorf("expected quoted Japanese/hash field, got: %s", ddl)
+	}
+	if !strings.Contains(ddl, `"has""quote" text`) {
+		t.Errorf("expected escaped double-quote in field name, got: %s", ddl)
 	}
 }
 

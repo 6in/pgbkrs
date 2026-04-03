@@ -19,7 +19,8 @@ func (g *DDLGenerator) GenerateDDL(def core.ObjectDef) ([]string, error) {
 
 	fields := make([]string, len(td.Fields))
 	for i, f := range td.Fields {
-		fields[i] = fmt.Sprintf("    %s %s", f.Name, f.Type)
+		quotedName := `"` + strings.ReplaceAll(f.Name, `"`, `""`) + `"`
+		fields[i] = fmt.Sprintf("    %s %s", quotedName, f.Type)
 	}
 
 	ddl := fmt.Sprintf("CREATE TYPE %s.%s AS (\n%s\n)", td.Schema, td.Name, strings.Join(fields, ",\n"))

@@ -70,11 +70,10 @@ func (g *DDLGenerator) GenerateDDL(def core.ObjectDef) ([]string, error) {
 
 	b.WriteString(")")
 
-	// Partition clause
+	// Partition clause — KeyExpression comes from pg_get_partkeydef() which already
+	// includes the strategy keyword (e.g. "RANGE (col)"), so use it directly.
 	if td.Partitioning != nil {
-		b.WriteString(fmt.Sprintf(" PARTITION BY %s (%s)",
-			strings.ToUpper(td.Partitioning.Strategy),
-			td.Partitioning.KeyExpression))
+		b.WriteString(fmt.Sprintf(" PARTITION BY %s", td.Partitioning.KeyExpression))
 	}
 
 	stmts := []string{b.String()}

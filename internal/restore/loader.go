@@ -133,6 +133,27 @@ func ddlGeneratorFor(kind string) core.DDLGenerator {
 	}
 }
 
+// findPartitionParent searches for the parent table name of a partition child when
+// from_table is not set in the manifest (backups generated before v0.2.0).
+// Scans <backupDir>/<schema>/tables/*/partitions/<name>/ and returns the parent name.
+func findPartitionParent(backupDir, schema, name string) string {
+	tablesDir := filepath.Join(backupDir, schema, "tables")
+	entries, err := os.ReadDir(tablesDir)
+	if err != nil {
+		return ""
+	}
+	for _, e := range entries {
+		if !e.IsDir() {
+			continue
+		}
+		candidate := filepath.Join(tablesDir, e.Name(), "partitions", name)
+		if _, err := os.Stat(candidate); err == nil {
+			return e.Name()
+		}
+	}
+	return ""
+}
+
 // loadObjectDef reads def.yaml from disk and deserializes it into a core.ObjectDef.
 // Returns an error for FK entries (no YAML file exists).
 func loadObjectDef(backupDir string, entry resolve.RestoreEntry) (core.ObjectDef, error) {
@@ -141,6 +162,13 @@ func loadObjectDef(backupDir string, entry resolve.RestoreEntry) (core.ObjectDef
 		return nil, fmt.Errorf("no def.yaml for kind %q (entry: %s.%s)", entry.Kind, entry.Schema, entry.Name)
 	}
 	data, err := os.ReadFile(yamlPath)
+	if err != nil && entry.Kind == "table" && entry.FromTable == "" {
+		// Fallback for pre-v0.2.0 backups: search under parent partition directories.
+		if parent := findPartitionParent(backupDir, entry.Schema, entry.Name); parent != "" {
+			alt := filepath.Join(backupDir, entry.Schema, "tables", parent, "partitions", entry.Name, "def.yaml")
+			data, err = os.ReadFile(alt)
+		}
+	}
 	if err != nil {
 		return nil, fmt.Errorf("read def.yaml for %s.%s: %w", entry.Schema, entry.Name, err)
 	}

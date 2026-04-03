@@ -119,7 +119,7 @@ func TestGenerateDDL_PartitionedTable(t *testing.T) {
 		Constraints: core.ConstraintsDef{},
 		Partitioning: &core.PartitionDef{
 			Strategy:      "range",
-			KeyExpression: "created_at",
+			KeyExpression: "RANGE (created_at)",
 			Children:      []string{"events_2024", "events_2025"},
 		},
 	}

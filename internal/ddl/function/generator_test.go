@@ -75,6 +75,75 @@ func TestGenerateDrop_NoArgs(t *testing.T) {
 	}
 }
 
+func TestGenerateDrop_WithDefaults(t *testing.T) {
+	g := &function.DDLGenerator{}
+	tests := []struct {
+		name     string
+		argTypes string
+		expected string
+	}{
+		{
+			name:     "single arg with DEFAULT",
+			argTypes: "p_table_name text DEFAULT NULL::text",
+			expected: "DROP FUNCTION IF EXISTS art_qc.sf_retire_table_after(p_table_name text) CASCADE",
+		},
+		{
+			name:     "multiple args some with DEFAULT",
+			argTypes: "a integer, b text DEFAULT 'hello'",
+			expected: "DROP FUNCTION IF EXISTS public.myfunc(a integer, b text) CASCADE",
+		},
+		{
+			name:     "complex type with parens and DEFAULT",
+			argTypes: "a numeric(10, 2) DEFAULT 0.0, b integer",
+			expected: "DROP FUNCTION IF EXISTS public.myfunc(a numeric(10, 2), b integer) CASCADE",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			parts := splitSchemaName(tc.expected)
+			def := core.FunctionDef{
+				ObjectHeader: core.ObjectHeader{Kind: core.KindFunction, Schema: parts[0], Name: parts[1]},
+				ArgTypes:     tc.argTypes,
+			}
+			stmts, err := g.GenerateDrop(def)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(stmts) != 1 {
+				t.Fatalf("expected 1 statement, got %d", len(stmts))
+			}
+			if stmts[0] != tc.expected {
+				t.Errorf("expected %q\ngot     %q", tc.expected, stmts[0])
+			}
+		})
+	}
+}
+
+// splitSchemaName extracts schema and function name from a DROP FUNCTION statement.
+// Only used in tests to avoid duplicating schema/name in test cases.
+func splitSchemaName(dropStmt string) [2]string {
+	// "DROP FUNCTION IF EXISTS schema.name(...) CASCADE"
+	after := dropStmt[len("DROP FUNCTION IF EXISTS "):]
+	dot := 0
+	for i, c := range after {
+		if c == '.' {
+			dot = i
+			break
+		}
+	}
+	schema := after[:dot]
+	rest := after[dot+1:]
+	paren := 0
+	for i, c := range rest {
+		if c == '(' {
+			paren = i
+			break
+		}
+	}
+	return [2]string{schema, rest[:paren]}
+}
+
 func TestGenerateDDL_WrongType(t *testing.T) {
 	g := &function.DDLGenerator{}
 	def := core.TableDef{

@@ -50,6 +50,7 @@ type ManifestParams struct {
 	ToolVersion string
 	Snapshot    bool
 	Skipped     []SkipEntry
+	ChildOf     map[string]string // partition child name → parent table name
 }
 
 // objectID returns "schema.name" format for an ObjectHeader (not "schema.kind.name").
@@ -168,6 +169,10 @@ func BuildManifest(objects []core.ObjectDef, params ManifestParams) (*Manifest, 
 			key := fmt.Sprintf("%s.%s.%s", h.Schema, string(h.Kind), h.Name)
 			if fk, ok := fkByKey[key]; ok {
 				entry.FromTable = fk.SourceTable
+			}
+		} else if h.Kind == core.KindTable {
+			if parent, ok := params.ChildOf[h.Name]; ok {
+				entry.FromTable = parent
 			}
 		}
 		restoreOrder = append(restoreOrder, entry)
