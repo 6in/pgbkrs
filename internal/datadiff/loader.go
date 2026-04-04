@@ -62,7 +62,7 @@ func loadBackupTables(backupDir string) (map[string]*tableEntry, error) {
 			return nil, fmt.Errorf("deserialize def.yaml for %s.%s: %w", entry.Schema, entry.Name, err)
 		}
 
-		td, ok := def.(core.TableDef)
+		td, ok := def.(*core.TableDef)
 		if !ok {
 			continue
 		}
@@ -77,7 +77,8 @@ func loadBackupTables(backupDir string) (map[string]*tableEntry, error) {
 
 		var pkCols []string
 		if td.Constraints.PrimaryKey != nil {
-			pkCols = td.Constraints.PrimaryKey.Columns
+			pkCols = make([]string, len(td.Constraints.PrimaryKey.Columns))
+			copy(pkCols, td.Constraints.PrimaryKey.Columns)
 		}
 
 		key := entry.Schema + "." + entry.Name
