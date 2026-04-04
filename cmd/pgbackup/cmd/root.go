@@ -27,8 +27,8 @@ var rootCmd = &cobra.Command{
 	SilenceUsage:  true,
 	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		if cmd.Name() == "diff" {
-			return nil // diff reads backup dirs from disk; no DB connection needed
+		if cmd.Name() == "diff" || cmd.Name() == "data-diff" {
+			return nil // these commands read backup dirs from disk; no DB connection needed
 		}
 		connStr := db.BuildConnString(host, port, user, password, dbname)
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -57,7 +57,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&password, "password", "", "PostgreSQL password")
 	rootCmd.PersistentFlags().StringVar(&dbname, "dbname", "", "Target database name")
 
-	rootCmd.AddCommand(backupCmd, restoreCmd, restoreTUICmd, diffCmd)
+	rootCmd.AddCommand(backupCmd, restoreCmd, restoreTUICmd, diffCmd, dataDiffCmd)
 }
 
 func printError(err error) {
