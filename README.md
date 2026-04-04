@@ -67,6 +67,37 @@ Before restoring, a safety backup of the target database is automatically writte
 
 Restore logs are written to a `restore_YYYYMMDD_HHMMSS/` directory containing `drop.log`, `restore.log`, and `summary.log`.
 
+### `restore-tui`
+
+Interactively select schemas and tables to restore from a backup using a terminal UI.
+
+```bash
+pgbackup restore-tui --host localhost --dbname mydb --input /backups/backup_20240101_120000
+```
+
+The TUI displays all schemas and tables found in the backup as a checkbox list. Navigate and select what to restore, then press Enter to start.
+
+**Keys:**
+
+| Key | Action |
+|-----|--------|
+| `↑` / `↓` or `k` / `j` | Move cursor |
+| `space` | Toggle selection (on a schema row: toggles all its tables) |
+| `a` | Select all |
+| `d` | Deselect all |
+| `Enter` | Confirm and start restore |
+| `q` / `Esc` | Cancel |
+
+**Flags:**
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--input` | **(required)** | Path to the backup directory to restore from |
+| `--pre-backup-dir` | `.` | Directory where the pre-restore safety backup will be written |
+| `--log-dir` | `.` | Directory for restore log files |
+
+A pre-restore safety backup is taken before any changes are made, same as `restore`. When all tables in a schema are selected, the full schema filter is applied; when individual tables are selected, each is restored along with its transitive dependencies.
+
 ### `diff`
 
 Compare two backup directories at the schema level (data differences are not included).
