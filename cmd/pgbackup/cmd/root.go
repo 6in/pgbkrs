@@ -57,7 +57,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&password, "password", "", "PostgreSQL password")
 	rootCmd.PersistentFlags().StringVar(&dbname, "dbname", "", "Target database name")
 
-	rootCmd.AddCommand(backupCmd, restoreCmd, restoreTUICmd, diffCmd, dataDiffCmd)
+	rootCmd.AddCommand(backupCmd, backupAICmd, restoreCmd, restoreTUICmd, diffCmd, dataDiffCmd)
 }
 
 func printError(err error) {

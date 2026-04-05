@@ -14,9 +14,10 @@ func TestRootNoArgs(t *testing.T) {
 
 func TestSubcommandsRecognized(t *testing.T) {
 	subcommands := map[string]bool{
-		"backup":  false,
-		"restore": false,
-		"diff":    false,
+		"backup":    false,
+		"backup-ai": false,
+		"restore":   false,
+		"diff":      false,
 	}
 	for _, sub := range rootCmd.Commands() {
 		if _, ok := subcommands[sub.Name()]; ok {

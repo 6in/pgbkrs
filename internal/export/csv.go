@@ -62,3 +62,38 @@ func ExportTableData(ctx context.Context, conn *pgx.Conn, schema, table, filePat
 		Checksum: checksum,
 	}, nil
 }
+
+// ExportTableDataSample exports at most limit rows from a table to a CSV file
+// using a COPY subquery. Unlike ExportTableData, the output includes a header row
+// with column names, making it suitable for AI-readable sample exports.
+func ExportTableDataSample(ctx context.Context, conn *pgx.Conn, schema, table, filePath string, columns []string, limit int) (*DataMeta, error) {
+	f, err := os.Create(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("create data file: %w", err)
+	}
+	defer f.Close()
+
+	hash := sha256.New()
+	w := io.MultiWriter(f, hash)
+
+	sql := fmt.Sprintf(`COPY (SELECT * FROM "%s"."%s" LIMIT %d) TO STDOUT WITH (FORMAT CSV, HEADER)`, schema, table, limit)
+	tag, err := conn.PgConn().CopyTo(ctx, w, sql)
+	if err != nil {
+		f.Close()
+		os.Remove(filePath)
+		return nil, fmt.Errorf("COPY TO: %w", err)
+	}
+
+	if err := f.Sync(); err != nil {
+		return nil, fmt.Errorf("sync data file: %w", err)
+	}
+
+	checksum := "sha256:" + hex.EncodeToString(hash.Sum(nil))
+
+	return &DataMeta{
+		File:     "data.csv",
+		Columns:  columns,
+		RowCount: tag.RowsAffected(),
+		Checksum: checksum,
+	}, nil
+}

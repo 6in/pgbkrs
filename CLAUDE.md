@@ -124,6 +124,16 @@ Stop the DB when done:
 make testdb-stop
 ```
 
+## GSD Workflow
+
+When starting work via GSD (any `/gsd:*` command that begins implementation), always create a feature branch first before making any code changes:
+
+```bash
+git checkout -b <branch-name>
+```
+
+Use a descriptive branch name based on the phase or task (e.g., `feat/data-diff`, `fix/help-output`).
+
 ## Commit Convention
 
 Planning artifact commits use: `docs(XX-YY): description` or `feat(XX-YY): description` where XX=phase, YY=plan. Regular code commits use conventional commits: `feat|fix|test|refactor|perf|chore(scope): message`.

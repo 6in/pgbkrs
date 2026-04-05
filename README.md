@@ -12,7 +12,7 @@ go build -o pgbackup ./cmd/pgbackup
 
 ## Connection Flags
 
-All subcommands (except `diff`) require a database connection:
+All subcommands (except `diff` and `data-diff`) require a database connection:
 
 | Flag | Default | Description |
 |------|---------|-------------|
@@ -42,6 +42,26 @@ pgbackup backup --host localhost --dbname mydb --output /backups
 | `--snapshot` | false | Use `REPEATABLE READ` transaction for a consistent snapshot across all reads |
 
 The `--snapshot` flag guarantees data consistency across all objects at the cost of holding a long-running transaction. Without it, objects are fetched individually (faster, but without strict consistency).
+
+### `backup-ai`
+
+Back up a PostgreSQL database in a format optimised for AI consumption.
+
+```bash
+pgbackup backup-ai --host localhost --dbname mydb --output /backups
+```
+
+Produces the same schema YAML files as `backup`, but with two key differences:
+
+- **Sampled CSV data:** each table exports at most 10 rows, with a column header row. Useful for giving an AI a representative sample without flooding its context window.
+- **README.md:** written at the backup root, summarising the database structure — table list, column counts, primary keys, foreign key relationships, and skipped tables — along with reading instructions for an AI assistant.
+
+**Flags:**
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--output` | `.` | Directory where the timestamped backup folder will be created |
+| `--snapshot` | false | Use `REPEATABLE READ` transaction for a consistent snapshot across all reads |
 
 ### `restore`
 

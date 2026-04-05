@@ -65,6 +65,17 @@ type kindFetcher struct {
 // snapshot=true: wraps all fetches and COPY TO calls in a single REPEATABLE READ
 // transaction; tx.Conn() is passed so that COPY participates in the snapshot.
 func RunBackup(ctx context.Context, conn *pgx.Conn, outDir string, snapshot bool) error {
+	return runBackup(ctx, conn, outDir, snapshot, false)
+}
+
+// RunBackupAI executes a backup optimized for AI consumption. It exports at most
+// 10 rows per table (with column headers) and writes a README.md at the backup root
+// summarizing the database structure for AI reading.
+func RunBackupAI(ctx context.Context, conn *pgx.Conn, outDir string, snapshot bool) error {
+	return runBackup(ctx, conn, outDir, snapshot, true)
+}
+
+func runBackup(ctx context.Context, conn *pgx.Conn, outDir string, snapshot bool, aiMode bool) error {
 	// 1. Create timestamped backup root
 	backupRoot := filepath.Join(outDir, time.Now().Local().Format("backup_20060102_150405"))
 	if err := os.MkdirAll(backupRoot, 0755); err != nil {
@@ -158,7 +169,12 @@ func RunBackup(ctx context.Context, conn *pgx.Conn, outDir string, snapshot bool
 					if export.ShouldExportData(td) {
 						cols := columnNames(td)
 						csvPath := filepath.Join(tableDir, "data.csv")
-						meta, err := export.ExportTableData(ctx, queryConn, schema, td.Name, csvPath, cols)
+						var meta *export.DataMeta
+						if aiMode {
+							meta, err = export.ExportTableDataSample(ctx, queryConn, schema, td.Name, csvPath, cols, 10)
+						} else {
+							meta, err = export.ExportTableData(ctx, queryConn, schema, td.Name, csvPath, cols)
+						}
 						if err != nil {
 							return fmt.Errorf("export %s.%s: %w", schema, td.Name, err)
 						}
@@ -232,6 +248,14 @@ func RunBackup(ctx context.Context, conn *pgx.Conn, outDir string, snapshot bool
 	}
 	if err := resolve.WriteManifest(filepath.Join(backupRoot, "_manifest.yaml"), manifest); err != nil {
 		return fmt.Errorf("write manifest: %w", err)
+	}
+
+	// 8. Write AI README for ai mode.
+	if aiMode {
+		dbName := conn.Config().Database
+		if err := writeAIReadme(backupRoot, dbName, pgVersion, params.BackupAt, allObjects, skipped); err != nil {
+			return fmt.Errorf("write AI README: %w", err)
+		}
 	}
 
 	return nil
