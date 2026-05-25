@@ -158,6 +158,10 @@ Recent decisions affecting current work:
 - [Phase 10-schema-diff]: cmd.Name() == diff guard in PersistentPreRunE skips DB connection for disk-only diff subcommand
 - [Phase 10-schema-diff]: cmd.Name() == diff guard in PersistentPreRunE avoids DB connection for disk-only diff subcommand
 
+### Roadmap Evolution
+
+- Phase 11 added: Oracle対応をする
+
 ### Pending Todos
 
 None yet.

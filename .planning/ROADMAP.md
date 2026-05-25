@@ -208,3 +208,13 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 8. Restore - Core Pipeline | 3/3 | Complete   | 2026-03-11 |
 | 9. Restore - Partial & Safety | 3/3 | Complete   | 2026-03-11 |
 | 10. Schema Diff | 3/3 | Complete    | 2026-03-12 |
+
+### Phase 11: Oracle対応をする
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 10
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 11 to break down)
