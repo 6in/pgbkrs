@@ -36,7 +36,7 @@ import (
 	serializeView "github.com/pgbkrs/pgbackup/internal/serialize/view"
 )
 
-const toolVersion = "0.3.0"
+const toolVersion = "0.4.0"
 
 // kindToDir maps ObjectKind to the subdirectory name under a schema directory.
 // This implements the spec section 4 directory layout.
